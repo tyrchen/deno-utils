@@ -11,7 +11,7 @@ A typescript transpiler using deno core and deno ast.
 """
 readme = "README.md"
 keywords = ["typescript", "transpiler", "deno", "v8"]
-categories = ["tools"]
+categories = ["development-tools::build-utils"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
