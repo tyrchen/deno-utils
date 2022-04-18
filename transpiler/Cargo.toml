@@ -2,6 +2,16 @@
 name = "deno-transpiler"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+documentation = "https://docs.rs/deno-transpiler"
+repository = "https://github.com/tyrchen/deno-utils"
+homepage = "https://github.com/tyrchen/deno-utils"
+description = """
+A typescript transpiler using deno core and deno ast.
+"""
+readme = "README.md"
+keywords = ["typescript", "transpiler", "deno", "v8"]
+categories = ["tools"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
