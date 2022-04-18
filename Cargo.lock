@@ -746,7 +746,6 @@ dependencies = [
  "deno_core",
  "deno_graph",
  "futures",
- "hyper",
  "pin-project",
  "reqwest",
  "tokio",
