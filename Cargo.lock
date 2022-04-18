@@ -729,6 +729,32 @@ dependencies = [
 ]
 
 [[package]]
+name = "deno-snapshot"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "deno_broadcast_channel",
+ "deno_console",
+ "deno_core",
+ "deno_crypto",
+ "deno_fetch",
+ "deno_ffi",
+ "deno_http",
+ "deno_net",
+ "deno_tls",
+ "deno_url",
+ "deno_web",
+ "deno_webgpu",
+ "deno_webidl",
+ "deno_websocket",
+ "deno_webstorage",
+ "glob",
+ "winapi",
+ "winres",
+ "zstd",
+]
+
+[[package]]
 name = "deno-transpiler"
 version = "0.1.0"
 dependencies = [
@@ -4263,32 +4289,6 @@ dependencies = [
  "lazy_static",
  "libc",
  "which",
-]
-
-[[package]]
-name = "v8_worker_snapshot"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "deno_broadcast_channel",
- "deno_console",
- "deno_core",
- "deno_crypto",
- "deno_fetch",
- "deno_ffi",
- "deno_http",
- "deno_net",
- "deno_tls",
- "deno_url",
- "deno_web",
- "deno_webgpu",
- "deno_webidl",
- "deno_websocket",
- "deno_webstorage",
- "glob",
- "winapi",
- "winres",
- "zstd",
 ]
 
 [[package]]

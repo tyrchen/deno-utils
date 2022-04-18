@@ -1,5 +1,5 @@
 [package]
-name = "v8_worker_snapshot"
+name = "deno-snapshot"
 version = "0.1.0"
 edition = "2021"
 

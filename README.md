@@ -6,3 +6,4 @@ Mainly provided:
    remote HTTP server, and data protocol.
 2. typescript transpiler.
 3. code bundler.
+4. snapshot utility functions.
