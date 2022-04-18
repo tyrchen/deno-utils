@@ -2,6 +2,16 @@
 name = "deno-snapshot"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+documentation = "https://docs.rs/deno-utils"
+repository = "https://github.com/tyrchen/deno-utils"
+homepage = "https://github.com/tyrchen/deno-utils"
+description = """
+Utility functions for deno.
+"""
+readme = "README.md"
+keywords = ["loader", "deno", "v8"]
+categories = ["development-tools"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

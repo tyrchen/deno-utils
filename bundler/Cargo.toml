@@ -2,6 +2,16 @@
 name = "deno-bundler"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+documentation = "https://docs.rs/deno-bundler"
+repository = "https://github.com/tyrchen/deno-utils"
+homepage = "https://github.com/tyrchen/deno-utils"
+description = """
+javascript/typescript bundler for deno.
+"""
+readme = "README.md"
+keywords = ["bundler", "deno", "v8"]
+categories = ["development-tools::build-utils"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -15,7 +25,7 @@ derive_builder = "0.11"
 futures = "0.3"
 serde = { version = "1", features = ["derive"] }
 
-deno-utils = { path = "../utils" }
+deno-utils = { version = "0.1", path = "../utils" }
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
