@@ -1,6 +1,8 @@
 [workspace]
 members = [
     "bundler",
+    "snapshot",
     "transpiler",
     "utils",
 ]
+resolver = "2"
