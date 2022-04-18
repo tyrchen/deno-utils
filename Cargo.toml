@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "bundler",
+    "runtime",
     "snapshot",
     "transpiler",
     "utils",
