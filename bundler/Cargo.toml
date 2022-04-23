@@ -19,7 +19,7 @@ categories = ["development-tools::build-utils"]
 askama = "0.11"
 base64 = "0.13"
 deno_ast = { version = "0.14", features = ["bundler"] }
-deno_core = "0.129"
+deno_core = "0.131"
 deno_graph = "0.26"
 derive_builder = "0.11"
 futures = "0.3"

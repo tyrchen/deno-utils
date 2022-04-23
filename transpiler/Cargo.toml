@@ -17,7 +17,7 @@ categories = ["development-tools::build-utils"]
 
 [dependencies]
 deno_ast = { version = "0.14", features = ["minifier", "module_specifier", "transpiling"] }
-deno_core = { version = "0.129" }
+deno_core = { version = "0.131" }
 
 [dev-dependencies]
 regex = "1"
