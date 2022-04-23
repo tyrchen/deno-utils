@@ -740,53 +740,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "deno-simple-runtime"
-version = "0.57.0"
-dependencies = [
- "atty",
- "deno_broadcast_channel",
- "deno_console",
- "deno_core",
- "deno_crypto",
- "deno_fetch",
- "deno_ffi",
- "deno_http",
- "deno_net",
- "deno_tls",
- "deno_url",
- "deno_web",
- "deno_webgpu",
- "deno_webidl",
- "deno_websocket",
- "deno_webstorage",
- "derive_builder",
- "dlopen",
- "encoding_rs",
- "filetime",
- "fs3",
- "fwdansi",
- "http",
- "hyper",
- "libc",
- "log",
- "lzzzz",
- "netif",
- "nix",
- "notify",
- "once_cell",
- "regex",
- "ring",
- "serde",
- "signal-hook-registry",
- "sys-info",
- "termcolor",
- "tokio",
- "uuid",
- "winapi",
- "winres",
-]
-
-[[package]]
 name = "deno-snapshot"
 version = "0.2.0"
 dependencies = [
@@ -1032,6 +985,53 @@ dependencies = [
  "proc-macro2 1.0.37",
  "quote 1.0.18",
  "syn 1.0.91",
+]
+
+[[package]]
+name = "deno_simple_runtime"
+version = "0.57.0"
+dependencies = [
+ "atty",
+ "deno_broadcast_channel",
+ "deno_console",
+ "deno_core",
+ "deno_crypto",
+ "deno_fetch",
+ "deno_ffi",
+ "deno_http",
+ "deno_net",
+ "deno_tls",
+ "deno_url",
+ "deno_web",
+ "deno_webgpu",
+ "deno_webidl",
+ "deno_websocket",
+ "deno_webstorage",
+ "derive_builder",
+ "dlopen",
+ "encoding_rs",
+ "filetime",
+ "fs3",
+ "fwdansi",
+ "http",
+ "hyper",
+ "libc",
+ "log",
+ "lzzzz",
+ "netif",
+ "nix",
+ "notify",
+ "once_cell",
+ "regex",
+ "ring",
+ "serde",
+ "signal-hook-registry",
+ "sys-info",
+ "termcolor",
+ "tokio",
+ "uuid",
+ "winapi",
+ "winres",
 ]
 
 [[package]]
