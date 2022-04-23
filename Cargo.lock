@@ -725,7 +725,7 @@ dependencies = [
 
 [[package]]
 name = "deno-bundler"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "askama",
  "base64 0.13.0",
@@ -741,7 +741,7 @@ dependencies = [
 
 [[package]]
 name = "deno-simple-runtime"
-version = "0.55.0"
+version = "0.57.0"
 dependencies = [
  "atty",
  "deno_broadcast_channel",
@@ -788,7 +788,7 @@ dependencies = [
 
 [[package]]
 name = "deno-snapshot"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "deno_broadcast_channel",
@@ -814,7 +814,7 @@ dependencies = [
 
 [[package]]
 name = "deno-transpiler"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "deno_ast",
  "deno_core",
@@ -823,7 +823,7 @@ dependencies = [
 
 [[package]]
 name = "deno-utils"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "data-url",
  "deno-transpiler",

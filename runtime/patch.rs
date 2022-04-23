@@ -11,7 +11,6 @@ impl Default for BootstrapOptions {
     fn default() -> Self {
         Self {
             args: vec![],
-            apply_source_maps: true,
             cpu_count: 1,
             debug_flag: false,
             enable_testing_features: false,

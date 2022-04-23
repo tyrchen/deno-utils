@@ -21,6 +21,7 @@ use deno_core::ModuleLoader;
 use deno_core::ModuleSpecifier;
 use deno_core::RuntimeOptions;
 use deno_core::SharedArrayBufferStore;
+// use deno_core::SourceMapGetter;
 use deno_tls::rustls::RootCertStore;
 use deno_web::BlobStore;
 use log::debug;
@@ -62,6 +63,7 @@ pub struct WorkerOptions {
     // Callbacks invoked when creating new instance of WebWorker
     pub create_web_worker_cb: Arc<ops::worker_host::CreateWebWorkerCb>,
     pub web_worker_preload_module_cb: Arc<ops::worker_host::PreloadModuleCb>,
+    // pub source_map_getter: Option<Box<dyn SourceMapGetter>>,
     pub js_error_create_fn: Option<Rc<JsErrorCreateFn>>,
     pub maybe_inspector_server: Option<Arc<InspectorServer>>,
     pub should_break_on_first_statement: bool,
@@ -144,6 +146,7 @@ impl MainWorker {
                 options.create_web_worker_cb.clone(),
                 options.web_worker_preload_module_cb.clone(),
             ),
+            ops::spawn::init(),
             ops::fs_events::init(),
             ops::fs::init(),
             ops::io::init(),
@@ -180,6 +183,7 @@ impl MainWorker {
         let mut js_runtime = JsRuntime::new(RuntimeOptions {
             module_loader: Some(options.module_loader.clone()),
             startup_snapshot: Some(snapshot),
+            // source_map_getter: options.source_map_getter,
             js_error_create_fn: options.js_error_create_fn.clone(),
             get_error_class_fn: options.get_error_class_fn,
             shared_array_buffer_store: options.shared_array_buffer_store.clone(),
@@ -205,7 +209,7 @@ impl MainWorker {
         }
     }
 
-    fn bootstrap(&mut self, options: &BootstrapOptions) {
+    pub fn bootstrap(&mut self, options: &BootstrapOptions) {
         let script = format!("bootstrap.mainRuntime({})", options.as_json());
         self.execute_script(&located_script_name!(), &script)
             .expect("Failed to execute bootstrap script");

@@ -9,7 +9,7 @@ use std::{
 
 use crate::permissions::Permissions;
 
-const JS_PATHS: &[&str] = &["js/**/*.js"];
+const JS_PATHS: &[&str] = &["../runtime/js/**/*.js"];
 
 pub fn create_snapshot_with_main_module(
     files: &[PathBuf],
