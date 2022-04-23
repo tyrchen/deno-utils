@@ -57,6 +57,7 @@ pub struct WorkerOptions {
     pub root_cert_store: Option<RootCertStore>,
     pub user_agent: String,
     pub seed: Option<u64>,
+    #[builder(default = "Rc::new(deno_core::FsModuleLoader)")]
     pub module_loader: Rc<dyn ModuleLoader>,
     // Callbacks invoked when creating new instance of WebWorker
     pub create_web_worker_cb: Arc<ops::worker_host::CreateWebWorkerCb>,
