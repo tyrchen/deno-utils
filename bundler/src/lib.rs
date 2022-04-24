@@ -54,7 +54,7 @@ pub struct BundleOptions {
 impl Default for BundleOptions {
     fn default() -> Self {
         Self {
-            bundle_type: BundleType::Module,
+            bundle_type: BundleType::Classic,
             ts_config: get_ts_config(ConfigType::Bundle).unwrap(),
             emit_ignore_directives: true,
             module_store: Some(Arc::new(FsModuleStore::default())),

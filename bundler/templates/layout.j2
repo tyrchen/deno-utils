@@ -1,9 +1,3 @@
 'use strict';
 
-((window) => {
-  async function main_module() {
-      {{ body }}
-  }
-
-  window.main_module = main_module;
-})(globalThis);
+globalThis.main_module = {{ body }}

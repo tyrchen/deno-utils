@@ -5,7 +5,7 @@ use data_url::DataUrl;
 use deno_core::{anyhow::bail, error::AnyError, ModuleSpecifier};
 use std::sync::Arc;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct UniversalModuleLoader {
     store: Option<Arc<dyn ModuleStore>>,
     compile: bool,
