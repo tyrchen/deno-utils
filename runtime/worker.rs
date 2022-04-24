@@ -49,6 +49,8 @@ pub struct MainWorker {
     should_break_on_first_statement: bool,
 }
 
+pub type RuntimeOptionsCallback = Rc<dyn Fn(RuntimeOptions) -> RuntimeOptions>;
+
 #[derive(Builder, Clone)]
 #[builder(default, pattern = "owned")]
 pub struct WorkerOptions {
@@ -78,6 +80,7 @@ pub struct WorkerOptions {
     pub main_module: Option<ModuleSpecifier>,
     pub permissions: Permissions,
     pub startup_snapshot: Option<StartSnapshot>,
+    pub runtime_options_callback: Option<RuntimeOptionsCallback>,
 }
 
 impl WorkerOptionsBuilder {
@@ -180,7 +183,7 @@ impl MainWorker {
             js::deno_isolate_init()
         };
 
-        let mut js_runtime = JsRuntime::new(RuntimeOptions {
+        let opts = RuntimeOptions {
             module_loader: Some(options.module_loader.clone()),
             startup_snapshot: Some(snapshot),
             // source_map_getter: options.source_map_getter,
@@ -190,7 +193,15 @@ impl MainWorker {
             compiled_wasm_module_store: options.compiled_wasm_module_store.clone(),
             extensions,
             ..Default::default()
-        });
+        };
+
+        let opts = if let Some(cb) = options.runtime_options_callback {
+            cb(opts)
+        } else {
+            opts
+        };
+
+        let mut js_runtime = JsRuntime::new(opts);
 
         if let Some(main) = main_module.as_ref() {
             if let Some(server) = options.maybe_inspector_server.clone() {

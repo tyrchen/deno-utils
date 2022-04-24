@@ -52,6 +52,7 @@ impl Default for WorkerOptions {
             main_module: None,
             permissions: Permissions::default(),
             startup_snapshot: None,
+            runtime_options_callback: None,
         }
     }
 }

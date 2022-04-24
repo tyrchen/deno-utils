@@ -725,7 +725,7 @@ dependencies = [
 
 [[package]]
 name = "deno-bundler"
-version = "0.2.2"
+version = "0.3.0"
 dependencies = [
  "askama",
  "base64 0.13.0",
@@ -991,7 +991,7 @@ dependencies = [
 
 [[package]]
 name = "deno_simple_runtime"
-version = "0.57.0"
+version = "0.57.1"
 dependencies = [
  "atty",
  "deno_broadcast_channel",

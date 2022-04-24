@@ -1,13 +1,14 @@
 mod config;
 mod hook;
 mod loader;
+mod options;
 mod resolver;
 
 use askama::Template;
-use config::{get_ts_config, ConfigType, TsConfig};
+use config::TsConfig;
 use deno_ast::swc;
 use deno_core::{anyhow::Context, error::AnyError, ModuleSpecifier};
-use deno_utils::{FsModuleStore, ModuleStore, UniversalModuleLoader};
+use deno_utils::{ModuleStore, UniversalModuleLoader};
 use derive_builder::Builder;
 use hook::BundleHook;
 use loader::BundleLoader;
@@ -17,12 +18,13 @@ use std::{collections::HashMap, rc::Rc, sync::Arc};
 const IGNORE_DIRECTIVES: &[&str] = &[
     "// deno-fmt-ignore-file",
     "// deno-lint-ignore-file",
-    "// This code was bundled using `deno bundle` and it's not recommended to edit it manually",
+    "// This code was bundled using `deno-bundler` and it's not recommended to edit it manually",
     "",
 ];
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BundleType {
+    MainModule,
     /// Return the emitted contents of the program as a single "flattened" ES
     /// module.
     Module,
@@ -32,15 +34,6 @@ pub enum BundleType {
     Classic,
 }
 
-impl From<BundleType> for swc::bundler::ModuleType {
-    fn from(bundle_type: BundleType) -> Self {
-        match bundle_type {
-            BundleType::Classic => Self::Iife,
-            BundleType::Module => Self::Es,
-        }
-    }
-}
-
 #[derive(Builder, Clone)]
 #[builder(default, pattern = "owned")]
 pub struct BundleOptions {
@@ -48,25 +41,13 @@ pub struct BundleOptions {
     pub ts_config: TsConfig,
     pub emit_ignore_directives: bool,
     pub module_store: Option<Arc<dyn ModuleStore>>,
-    pub global_this: bool,
-}
-
-impl Default for BundleOptions {
-    fn default() -> Self {
-        Self {
-            bundle_type: BundleType::Classic,
-            ts_config: get_ts_config(ConfigType::Bundle).unwrap(),
-            emit_ignore_directives: true,
-            module_store: Some(Arc::new(FsModuleStore::default())),
-            global_this: false,
-        }
-    }
 }
 
 #[derive(Template)]
 #[template(path = "layout.j2", escape = "none")]
 struct BundledJs {
     body: String,
+    bundle_type: BundleType,
 }
 
 /// Given a module graph, generate and return a bundle of the graph and
@@ -166,10 +147,11 @@ pub async fn bundle(
             }
         }
 
-        if options.global_this {
-            let tpl = BundledJs { body: code };
-            code = tpl.render()?;
-        }
+        let tpl = BundledJs {
+            body: code,
+            bundle_type: options.bundle_type,
+        };
+        code = tpl.render()?;
         Ok((code, maybe_map))
     })
 }
@@ -183,7 +165,7 @@ mod tests {
     use super::*;
 
     #[tokio::test]
-    async fn bundle_code_should_work() {
+    async fn bundle_code_module_should_work() {
         let options = BundleOptions::default();
         let f = Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/main.ts");
         let f = f.to_string_lossy().to_string();
@@ -194,6 +176,32 @@ mod tests {
         assert!(ret.is_ok());
         let imported = resolve_url_or_path("https://deno.land/std@0.134.0/http/server.ts").unwrap();
         let ret = store.get(imported.as_str()).await;
+        assert!(ret.is_ok());
+    }
+
+    #[tokio::test]
+    async fn bundle_code_classic_should_work() {
+        let options = BundleOptions {
+            bundle_type: BundleType::Classic,
+            ..BundleOptions::default()
+        };
+        let f = Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/main.ts");
+        let f = f.to_string_lossy().to_string();
+        let m = resolve_url_or_path(&f).unwrap();
+        let ret = bundle(m.clone(), options.clone()).await;
+        assert!(ret.is_ok());
+    }
+
+    #[tokio::test]
+    async fn bundle_code_main_module_should_work() {
+        let options = BundleOptions {
+            bundle_type: BundleType::MainModule,
+            ..BundleOptions::default()
+        };
+        let f = Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/main.ts");
+        let f = f.to_string_lossy().to_string();
+        let m = resolve_url_or_path(&f).unwrap();
+        let ret = bundle(m.clone(), options.clone()).await;
         assert!(ret.is_ok());
     }
 }
