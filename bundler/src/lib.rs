@@ -7,10 +7,8 @@ use askama::Template;
 use config::{get_ts_config, ConfigType, TsConfig};
 use deno_ast::swc;
 use deno_core::{anyhow::Context, error::AnyError, ModuleSpecifier};
-use deno_graph::source::{LoadFuture, Loader};
-use deno_utils::{ModuleStore, UniversalModuleLoader};
+use deno_utils::{FsModuleStore, ModuleStore, UniversalModuleLoader};
 use derive_builder::Builder;
-use futures::future;
 use hook::BundleHook;
 use loader::BundleLoader;
 use resolver::BundleResolver;
@@ -23,6 +21,7 @@ const IGNORE_DIRECTIVES: &[&str] = &[
     "",
 ];
 
+#[derive(Debug, Clone, Copy)]
 pub enum BundleType {
     /// Return the emitted contents of the program as a single "flattened" ES
     /// module.
@@ -42,7 +41,7 @@ impl From<BundleType> for swc::bundler::ModuleType {
     }
 }
 
-#[derive(Builder)]
+#[derive(Builder, Clone)]
 #[builder(default, pattern = "owned")]
 pub struct BundleOptions {
     pub bundle_type: BundleType,
@@ -58,7 +57,7 @@ impl Default for BundleOptions {
             bundle_type: BundleType::Module,
             ts_config: get_ts_config(ConfigType::Bundle).unwrap(),
             emit_ignore_directives: true,
-            module_store: None,
+            module_store: Some(Arc::new(FsModuleStore::default())),
             global_this: false,
         }
     }
@@ -175,10 +174,26 @@ pub async fn bundle(
     })
 }
 
-struct DummyLoader;
+#[cfg(test)]
+mod tests {
+    use std::path::Path;
 
-impl Loader for DummyLoader {
-    fn load(&mut self, _specifier: &ModuleSpecifier, _is_dynamic: bool) -> LoadFuture {
-        Box::pin(future::ready(Ok(None)))
+    use deno_core::resolve_url_or_path;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn bundle_code_should_work() {
+        let options = BundleOptions::default();
+        let f = Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/main.ts");
+        let f = f.to_string_lossy().to_string();
+        let m = resolve_url_or_path(&f).unwrap();
+        let (_bundle, _) = bundle(m.clone(), options.clone()).await.unwrap();
+        let store = options.module_store.unwrap();
+        let ret = store.get(m.as_str()).await;
+        assert!(ret.is_ok());
+        let imported = resolve_url_or_path("https://deno.land/std@0.134.0/http/server.ts").unwrap();
+        let ret = store.get(imported.as_str()).await;
+        assert!(ret.is_ok());
     }
 }

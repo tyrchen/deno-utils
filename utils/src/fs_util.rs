@@ -3,6 +3,7 @@
 use deno_core::anyhow::Context;
 use deno_core::error::AnyError;
 use std::env::current_dir;
+use std::hash::{Hash, Hasher};
 use std::io::Error;
 use std::path::{Component, Path, PathBuf};
 
@@ -61,6 +62,17 @@ pub fn normalize_path<P: AsRef<Path>>(path: P) -> PathBuf {
         }
     }
     ret
+}
+
+pub fn to_hash_path(base: &Path, key: &str) -> PathBuf {
+    let hash = get_hash_from_key(key);
+    base.join(format!("{}/{}/{}", &hash[..2], &hash[2..4], &hash[4..]))
+}
+
+fn get_hash_from_key(key: &str) -> String {
+    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+    key.hash(&mut hasher);
+    format!("{:x}", hasher.finish())
 }
 
 #[cfg(test)]

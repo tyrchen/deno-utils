@@ -1,6 +1,6 @@
 [package]
 name = "deno-utils"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 license = "MIT"
 documentation = "https://docs.rs/deno-utils"
@@ -16,9 +16,11 @@ categories = ["development-tools"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+async-trait = "0.1"
 data-url = "0.1.1"
 deno_core = "0.131"
 deno_graph = "0.26"
+dirs = "4"
 futures = "0.3"
 pin-project = "1"
 reqwest = "0.11"
