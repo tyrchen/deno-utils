@@ -16,16 +16,16 @@ categories = ["development-tools::build-utils"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-askama = "0.11"
-base64 = "0.13"
-deno_ast = { version = "0.14", features = ["bundler"] }
-deno_core = "0.131"
-deno_graph = "0.26"
-derive_builder = "0.11"
-futures = "0.3"
-serde = { version = "1", features = ["derive"] }
+askama = "0.11.1"
+base64 = "0.13.0"
+deno_ast = { version = "0.14.0", features = ["bundler"] }
+deno_core = "0.131.0"
+deno_graph = "0.26.0"
+derive_builder = "0.11.2"
+futures = "0.3.21"
+serde = { version = "1.0.136", features = ["derive"] }
 
-deno-utils = { version = "0.2", path = "../utils" }
+deno-utils = { version = "0.2.1", path = "../utils" }
 
 [dev-dependencies]
-tokio = { version = "1", features = ["full"] }
+tokio = { version = "1.17.0", features = ["full"] }
