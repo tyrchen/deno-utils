@@ -32,6 +32,7 @@ impl Default for WorkerOptions {
             root_cert_store: None,
             user_agent: USER_AGENT.to_string(),
             seed: None,
+            format_js_error_fn: None,
             module_loader: Rc::new(FsModuleLoader),
             create_web_worker_cb: Arc::new(|_| {
                 panic!("Web workers are not supported");
@@ -48,6 +49,7 @@ impl Default for WorkerOptions {
             broadcast_channel: InMemoryBroadcastChannel::default(),
             shared_array_buffer_store: None,
             compiled_wasm_module_store: None,
+            stdio: Default::default(),
 
             main_module: None,
             permissions: Permissions::default(),

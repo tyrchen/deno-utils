@@ -4,8 +4,10 @@ use crate::colors;
 use crate::inspector_server::InspectorServer;
 use crate::js;
 use crate::ops;
+use crate::ops::io::Stdio;
 use crate::permissions::Permissions;
 use crate::tokio_util::run_basic;
+use crate::worker::FormatJsErrorFn;
 use crate::BootstrapOptions;
 use deno_broadcast_channel::InMemoryBroadcastChannel;
 use deno_core::error::AnyError;
@@ -23,7 +25,6 @@ use deno_core::CancelHandle;
 use deno_core::CompiledWasmModuleStore;
 use deno_core::Extension;
 use deno_core::GetErrorClassFn;
-use deno_core::JsErrorCreateFn;
 use deno_core::JsRuntime;
 use deno_core::ModuleId;
 use deno_core::ModuleLoader;
@@ -321,8 +322,8 @@ pub struct WebWorkerOptions {
     pub module_loader: Rc<dyn ModuleLoader>,
     pub create_web_worker_cb: Arc<ops::worker_host::CreateWebWorkerCb>,
     pub preload_module_cb: Arc<ops::worker_host::PreloadModuleCb>,
+    pub format_js_error_fn: Option<Arc<FormatJsErrorFn>>,
     // pub source_map_getter: Option<Box<dyn SourceMapGetter>>,
-    pub js_error_create_fn: Option<Rc<JsErrorCreateFn>>,
     pub use_deno_namespace: bool,
     pub worker_type: WebWorkerType,
     pub maybe_inspector_server: Option<Arc<InspectorServer>>,
@@ -332,6 +333,7 @@ pub struct WebWorkerOptions {
     pub shared_array_buffer_store: Option<SharedArrayBufferStore>,
     pub compiled_wasm_module_store: Option<CompiledWasmModuleStore>,
     pub maybe_exit_code: Option<Arc<AtomicI32>>,
+    pub stdio: Stdio,
 
     pub permissions: Permissions,
     pub startup_snapshot: Option<StartSnapshot>,
@@ -399,16 +401,16 @@ impl WebWorker {
             deno_ffi::init::<Permissions>(unstable),
             // Runtime ops that are always initialized for WebWorkers
             ops::web_worker::init(),
-            ops::runtime::init(main_module.clone()),
             ops::worker_host::init(
                 options.create_web_worker_cb.clone(),
                 options.preload_module_cb.clone(),
+                options.format_js_error_fn.clone(),
             ),
             // Extensions providing Deno.* features
             ops::fs_events::init().enabled(options.use_deno_namespace),
             ops::fs::init().enabled(options.use_deno_namespace),
             ops::io::init(),
-            ops::io::init_stdio().enabled(options.use_deno_namespace),
+            ops::io::init_stdio(options.stdio).enabled(options.use_deno_namespace),
             deno_tls::init().enabled(options.use_deno_namespace),
             deno_net::init::<Permissions>(
                 options.root_cert_store.clone(),
@@ -446,7 +448,6 @@ impl WebWorker {
             module_loader: Some(options.module_loader.clone()),
             startup_snapshot: Some(snapshot),
             // source_map_getter: options.source_map_getter,
-            js_error_create_fn: options.js_error_create_fn.clone(),
             get_error_class_fn: options.get_error_class_fn,
             shared_array_buffer_store: options.shared_array_buffer_store.clone(),
             compiled_wasm_module_store: options.compiled_wasm_module_store.clone(),
