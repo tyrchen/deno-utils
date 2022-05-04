@@ -1,6 +1,6 @@
 [package]
 name = "deno-transpiler"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2021"
 license = "MIT"
 documentation = "https://docs.rs/deno-transpiler"
@@ -16,8 +16,8 @@ categories = ["development-tools::build-utils"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-deno_ast = { version = "0.14", features = ["minifier", "module_specifier", "transpiling"] }
-deno_core = { version = "0.132.0" }
+deno_ast = { version = "0.14.0", features = ["minifier", "module_specifier", "transpiling"] }
+deno_core = "0.132.0"
 
 [dev-dependencies]
-regex = "1"
+regex = "1.5.5"
