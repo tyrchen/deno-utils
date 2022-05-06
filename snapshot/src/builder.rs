@@ -1,30 +1,33 @@
 use anyhow::Result;
 use deno_broadcast_channel::InMemoryBroadcastChannel;
-use deno_core::{JsRuntime, RuntimeOptions};
+use deno_core::{Extension, JsRuntime, RuntimeOptions};
 use deno_web::BlobStore;
-use std::{
-    env,
-    path::{Path, PathBuf},
-};
+use std::{env, path::PathBuf};
 
 use crate::permissions::Permissions;
 
 const JS_PATHS: &[&str] = &["js/**/*.js"];
 
 pub fn create_snapshot_with_main_module(
+    exts: Vec<Extension>,
     files: &[PathBuf],
     code: Option<String>,
 ) -> Result<Vec<u8>> {
-    _create_snapshot(files, code, false)
+    _create_snapshot(exts, files, code, false)
 }
 
-pub fn create_snapshot(files: &[PathBuf]) -> Result<Vec<u8>> {
-    _create_snapshot(files, None, true)
+pub fn create_snapshot(exts: Vec<Extension>, files: &[PathBuf]) -> Result<Vec<u8>> {
+    _create_snapshot(exts, files, None, true)
 }
 
-pub fn _create_snapshot(files: &[PathBuf], code: Option<String>, build: bool) -> Result<Vec<u8>> {
+pub fn _create_snapshot(
+    exts: Vec<Extension>,
+    files: &[PathBuf],
+    code: Option<String>,
+    build: bool,
+) -> Result<Vec<u8>> {
     // Order matters!
-    let extensions = vec![
+    let mut extensions = vec![
         deno_webidl::init(),
         deno_console::init(),
         deno_url::init(),
@@ -43,6 +46,7 @@ pub fn _create_snapshot(files: &[PathBuf], code: Option<String>, build: bool) ->
         ),
         deno_http::init(),
     ];
+    extensions.extend(exts);
 
     let rt = JsRuntime::new(RuntimeOptions {
         will_snapshot: true,
@@ -74,15 +78,15 @@ fn _gen_snapshot(
     build: bool,
 ) -> Result<Vec<u8>> {
     let base_dir = env!("CARGO_MANIFEST_DIR");
-    let display_root = Path::new(base_dir).parent().unwrap();
+    // let display_root = Path::new(base_dir).parent().unwrap();
     let mut all_files = get_js_files(base_dir, JS_PATHS);
     all_files.extend_from_slice(files);
     for file in all_files {
         if build {
             println!("cargo:rerun-if-changed={}", file.display());
         }
-        let display_path = file.strip_prefix(display_root).unwrap();
-        let display_path_str = display_path.display().to_string();
+        // let display_path = file.strip_prefix(display_root).unwrap();
+        let display_path_str = file.display().to_string();
         rt.execute_script(
             &("deno:".to_string() + &display_path_str.replace('\\', "/")),
             &std::fs::read_to_string(&file).unwrap(),

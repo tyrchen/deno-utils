@@ -1,13 +1,13 @@
 'use strict';
 {% if bundle_type == BundleType::MainModule %}
 ((window) => {
-  async function main_module() {
+  async function mainModule() {
       {{ body }}
   }
-  window.main_module = main_module;
+  window.mainModule = mainModule;
 })(globalThis);
 {% else if bundle_type == BundleType::Classic %}
-globalThis.main_module = {{ body }}
+globalThis.mainModule = {{ body }}
 {% else %}
 {{ body }}
 {% endif %}

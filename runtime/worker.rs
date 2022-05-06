@@ -297,7 +297,7 @@ impl MainWorker {
             self.js_runtime
                 .load_main_module(
                     &resolve_url_or_path("main_module").unwrap(),
-                    Some("await main_module()".into()),
+                    Some("await mainModule()".into()),
                 )
                 .await?
         };

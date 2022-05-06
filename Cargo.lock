@@ -725,7 +725,7 @@ dependencies = [
 
 [[package]]
 name = "deno-bundler"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "askama",
  "base64 0.13.0",
@@ -741,7 +741,7 @@ dependencies = [
 
 [[package]]
 name = "deno-snapshot"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "anyhow",
  "deno_broadcast_channel",
@@ -776,7 +776,7 @@ dependencies = [
 
 [[package]]
 name = "deno-utils"
-version = "0.2.4"
+version = "0.3.0"
 dependencies = [
  "async-trait",
  "data-url",
@@ -785,6 +785,8 @@ dependencies = [
  "deno_graph",
  "dirs",
  "futures",
+ "mime",
+ "phf",
  "pin-project",
  "reqwest",
  "tokio",
@@ -992,7 +994,7 @@ dependencies = [
 
 [[package]]
 name = "deno_simple_runtime"
-version = "0.58.1"
+version = "0.58.2"
 dependencies = [
  "atty",
  "deno_broadcast_channel",

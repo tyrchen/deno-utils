@@ -1,3 +1,4 @@
+mod compressible;
 mod data_channel;
 mod fs_util;
 mod loader;
@@ -5,6 +6,7 @@ mod store;
 mod tokio_util;
 mod unstable_checker;
 
+pub use compressible::*;
 pub use data_channel::*;
 pub use fs_util::*;
 pub use loader::*;
