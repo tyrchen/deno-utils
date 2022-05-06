@@ -19,8 +19,8 @@ use deno_core::error::AnyError;
 use std::fmt;
 #[async_trait]
 pub trait ModuleStore: fmt::Debug + Send + Sync {
-    async fn get(&self, specifier: &str) -> Result<String, AnyError>;
-    async fn put(&self, specifier: String, code: String) -> Result<(), AnyError>;
+    async fn get(&self, specifier: &str) -> Result<Box<[u8]>, AnyError>;
+    async fn put(&self, specifier: String, code: &[u8]) -> Result<(), AnyError>;
 }
 
 #[cfg(test)]

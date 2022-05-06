@@ -26,22 +26,22 @@ impl FsModuleStore {
 
 #[async_trait]
 impl ModuleStore for FsModuleStore {
-    async fn get(&self, key: &str) -> Result<String, AnyError> {
+    async fn get(&self, key: &str) -> Result<Box<[u8]>, AnyError> {
         let path = to_hash_path(&self.base, key);
         if !path.exists() {
             bail!("Module not found: {}", key);
         }
         let mut file = fs::File::open(&path)?;
-        let mut contents = String::new();
-        file.read_to_string(&mut contents)?;
-        Ok(contents)
+        let mut contents = Vec::new();
+        file.read_to_end(&mut contents)?;
+        Ok(contents.into_boxed_slice())
     }
 
-    async fn put(&self, key: String, value: String) -> Result<(), AnyError> {
+    async fn put(&self, key: String, value: &[u8]) -> Result<(), AnyError> {
         let path = to_hash_path(&self.base, &key);
         fs::create_dir_all(path.parent().unwrap())?;
         let mut file = fs::File::create(&path)?;
-        file.write_all(value.as_bytes())?;
+        file.write_all(value)?;
         Ok(())
     }
 }
@@ -55,11 +55,8 @@ mod tests {
     async fn module_store_should_work() {
         let base = PathBuf::from("/tmp/deno_fs_store");
         let store = FsModuleStore::new(base);
-        store
-            .put("foo".to_string(), "bar".to_string())
-            .await
-            .unwrap();
+        store.put("foo".to_string(), b"bar").await.unwrap();
         let contents = store.get("foo").await.unwrap();
-        assert_eq!(contents, "bar");
+        assert_eq!(&contents[..], b"bar");
     }
 }

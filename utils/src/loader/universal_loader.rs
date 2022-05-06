@@ -45,7 +45,7 @@ impl UniversalModuleLoader {
             code = compile(m, code, minify)?;
         }
         if let Some(store) = self.store.as_ref() {
-            store.put(m.to_string(), code.clone()).await?;
+            store.put(m.to_string(), code.as_bytes()).await?;
         }
         Ok(code)
     }
@@ -86,7 +86,7 @@ impl ModuleLoader for UniversalModuleLoader {
             let code = loader.get_and_update_source(&m, false).await?;
 
             Ok(ModuleSource {
-                code,
+                code: code.into_bytes().into_boxed_slice(),
                 module_type,
                 module_url_specified: string_specifier.clone(),
                 module_url_found: string_specifier,
@@ -148,6 +148,6 @@ mod tests {
         assert_eq!(content, expected);
 
         let cache = store.get(m.as_str()).await.unwrap();
-        assert_eq!(cache, expected);
+        assert_eq!(cache, expected.as_bytes().to_vec().into_boxed_slice());
     }
 }

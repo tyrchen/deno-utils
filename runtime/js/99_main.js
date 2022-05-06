@@ -2,7 +2,7 @@
 // Removes the `__proto__` for security reasons.  This intentionally makes
 // Deno non compliant with ECMA-262 Annex B.2.2.1
 //
-"use strict";
+'use strict';
 delete Object.prototype.__proto__;
 
 ((window) => {
@@ -32,7 +32,6 @@ delete Object.prototype.__proto__;
   const location = window.__bootstrap.location;
   const build = window.__bootstrap.build;
   const version = window.__bootstrap.version;
-  const errorStack = window.__bootstrap.errorStack;
   const os = window.__bootstrap.os;
   const timers = window.__bootstrap.timers;
   const base64 = window.__bootstrap.base64;
@@ -74,13 +73,16 @@ delete Object.prototype.__proto__;
       windowIsClosing = true;
       // Push a macrotask to exit after a promise resolve.
       // This is not perfect, but should be fine for first pass.
-      PromisePrototypeThen(
-        PromiseResolve(),
-        () =>
-          FunctionPrototypeCall(timers.setTimeout, null, () => {
+      PromisePrototypeThen(PromiseResolve(), () =>
+        FunctionPrototypeCall(
+          timers.setTimeout,
+          null,
+          () => {
             // This should be fine, since only Window/MainWorker has .close()
             os.exit(0);
-          }, 0),
+          },
+          0
+        )
       );
     }
   }
@@ -91,7 +93,7 @@ delete Object.prototype.__proto__;
     }
 
     isClosing = true;
-    core.opSync("op_worker_close");
+    core.opSync('op_worker_close');
   }
 
   function postMessage(message, transferOrOptions = {}) {
@@ -101,13 +103,13 @@ delete Object.prototype.__proto__;
     message = webidl.converters.any(message);
     let options;
     if (
-      webidl.type(transferOrOptions) === "Object" &&
+      webidl.type(transferOrOptions) === 'Object' &&
       transferOrOptions !== undefined &&
       transferOrOptions[SymbolIterator] !== undefined
     ) {
-      const transfer = webidl.converters["sequence<object>"](
+      const transfer = webidl.converters['sequence<object>'](
         transferOrOptions,
-        { prefix, context: "Argument 2" },
+        { prefix, context: 'Argument 2' }
       );
       options = { transfer };
     } else {
@@ -115,13 +117,13 @@ delete Object.prototype.__proto__;
         transferOrOptions,
         {
           prefix,
-          context: "Argument 2",
-        },
+          context: 'Argument 2',
+        }
       );
     }
     const { transfer } = options;
     const data = serializeJsMessageData(message, transfer);
-    core.opSync("op_worker_post_message", data);
+    core.opSync('op_worker_post_message', data);
   }
 
   let isClosing = false;
@@ -131,17 +133,17 @@ delete Object.prototype.__proto__;
     if (!globalDispatchEvent) {
       globalDispatchEvent = FunctionPrototypeBind(
         globalThis.dispatchEvent,
-        globalThis,
+        globalThis
       );
     }
     while (!isClosing) {
-      const data = await core.opAsync("op_worker_recv_message");
+      const data = await core.opAsync('op_worker_recv_message');
       if (data === null) break;
       const v = deserializeJsMessageData(data);
       const message = v[0];
       const transferables = v[1];
 
-      const msgEvent = new MessageEvent("message", {
+      const msgEvent = new MessageEvent('message', {
         cancelable: false,
         data: message,
         ports: transferables.filter((t) =>
@@ -152,7 +154,7 @@ delete Object.prototype.__proto__;
       try {
         globalDispatchEvent(msgEvent);
       } catch (e) {
-        const errorEvent = new ErrorEvent("error", {
+        const errorEvent = new ErrorEvent('error', {
           cancelable: true,
           message: e.message,
           lineno: e.lineNumber ? e.lineNumber + 1 : undefined,
@@ -172,7 +174,7 @@ delete Object.prototype.__proto__;
   let loadedMainWorkerScript = false;
 
   function importScripts(...urls) {
-    if (core.opSync("op_worker_get_type") === "module") {
+    if (core.opSync('op_worker_get_type') === 'module') {
       throw new TypeError("Can't import scripts in a module worker.");
     }
 
@@ -182,8 +184,8 @@ delete Object.prototype.__proto__;
         return new url.URL(scriptUrl, baseUrl ?? undefined).href;
       } catch {
         throw new domException.DOMException(
-          "Failed to parse URL.",
-          "SyntaxError",
+          'Failed to parse URL.',
+          'SyntaxError'
         );
       }
     });
@@ -193,9 +195,9 @@ delete Object.prototype.__proto__;
     // TODO(andreubotella) Refactor worker creation so the main script isn't
     // loaded with `importScripts()`.
     const scripts = core.opSync(
-      "op_worker_sync_fetch",
+      'op_worker_sync_fetch',
       parsedUrls,
-      !loadedMainWorkerScript,
+      !loadedMainWorkerScript
     );
     loadedMainWorkerScript = true;
 
@@ -208,7 +210,7 @@ delete Object.prototype.__proto__;
   }
 
   function opMainModule() {
-    return core.opSync("op_main_module");
+    return core.opSync('op_main_module');
   }
 
   function runtimeStart(runtimeOptions, source) {
@@ -217,78 +219,75 @@ delete Object.prototype.__proto__;
     version.setVersions(
       runtimeOptions.denoVersion,
       runtimeOptions.v8Version,
-      runtimeOptions.tsVersion,
+      runtimeOptions.tsVersion
     );
     build.setBuildInfo(runtimeOptions.target);
     util.setLogDebug(runtimeOptions.debugFlag, source);
-    const prepareStackTrace = core.createPrepareStackTrace(
-      errorStack.opFormatFileName,
-    );
     // deno-lint-ignore prefer-primordials
-    Error.prepareStackTrace = prepareStackTrace;
+    Error.prepareStackTrace = core.prepareStackTrace;
   }
 
   function registerErrors() {
-    core.registerErrorClass("NotFound", errors.NotFound);
-    core.registerErrorClass("PermissionDenied", errors.PermissionDenied);
-    core.registerErrorClass("ConnectionRefused", errors.ConnectionRefused);
-    core.registerErrorClass("ConnectionReset", errors.ConnectionReset);
-    core.registerErrorClass("ConnectionAborted", errors.ConnectionAborted);
-    core.registerErrorClass("NotConnected", errors.NotConnected);
-    core.registerErrorClass("AddrInUse", errors.AddrInUse);
-    core.registerErrorClass("AddrNotAvailable", errors.AddrNotAvailable);
-    core.registerErrorClass("BrokenPipe", errors.BrokenPipe);
-    core.registerErrorClass("AlreadyExists", errors.AlreadyExists);
-    core.registerErrorClass("InvalidData", errors.InvalidData);
-    core.registerErrorClass("TimedOut", errors.TimedOut);
-    core.registerErrorClass("Interrupted", errors.Interrupted);
-    core.registerErrorClass("WriteZero", errors.WriteZero);
-    core.registerErrorClass("UnexpectedEof", errors.UnexpectedEof);
-    core.registerErrorClass("BadResource", errors.BadResource);
-    core.registerErrorClass("Http", errors.Http);
-    core.registerErrorClass("Busy", errors.Busy);
-    core.registerErrorClass("NotSupported", errors.NotSupported);
+    core.registerErrorClass('NotFound', errors.NotFound);
+    core.registerErrorClass('PermissionDenied', errors.PermissionDenied);
+    core.registerErrorClass('ConnectionRefused', errors.ConnectionRefused);
+    core.registerErrorClass('ConnectionReset', errors.ConnectionReset);
+    core.registerErrorClass('ConnectionAborted', errors.ConnectionAborted);
+    core.registerErrorClass('NotConnected', errors.NotConnected);
+    core.registerErrorClass('AddrInUse', errors.AddrInUse);
+    core.registerErrorClass('AddrNotAvailable', errors.AddrNotAvailable);
+    core.registerErrorClass('BrokenPipe', errors.BrokenPipe);
+    core.registerErrorClass('AlreadyExists', errors.AlreadyExists);
+    core.registerErrorClass('InvalidData', errors.InvalidData);
+    core.registerErrorClass('TimedOut', errors.TimedOut);
+    core.registerErrorClass('Interrupted', errors.Interrupted);
+    core.registerErrorClass('WriteZero', errors.WriteZero);
+    core.registerErrorClass('UnexpectedEof', errors.UnexpectedEof);
+    core.registerErrorClass('BadResource', errors.BadResource);
+    core.registerErrorClass('Http', errors.Http);
+    core.registerErrorClass('Busy', errors.Busy);
+    core.registerErrorClass('NotSupported', errors.NotSupported);
     core.registerErrorBuilder(
-      "DOMExceptionOperationError",
+      'DOMExceptionOperationError',
       function DOMExceptionOperationError(msg) {
-        return new domException.DOMException(msg, "OperationError");
-      },
+        return new domException.DOMException(msg, 'OperationError');
+      }
     );
     core.registerErrorBuilder(
-      "DOMExceptionQuotaExceededError",
+      'DOMExceptionQuotaExceededError',
       function DOMExceptionQuotaExceededError(msg) {
-        return new domException.DOMException(msg, "QuotaExceededError");
-      },
+        return new domException.DOMException(msg, 'QuotaExceededError');
+      }
     );
     core.registerErrorBuilder(
-      "DOMExceptionNotSupportedError",
+      'DOMExceptionNotSupportedError',
       function DOMExceptionNotSupportedError(msg) {
-        return new domException.DOMException(msg, "NotSupported");
-      },
+        return new domException.DOMException(msg, 'NotSupported');
+      }
     );
     core.registerErrorBuilder(
-      "DOMExceptionNetworkError",
+      'DOMExceptionNetworkError',
       function DOMExceptionNetworkError(msg) {
-        return new domException.DOMException(msg, "NetworkError");
-      },
+        return new domException.DOMException(msg, 'NetworkError');
+      }
     );
     core.registerErrorBuilder(
-      "DOMExceptionAbortError",
+      'DOMExceptionAbortError',
       function DOMExceptionAbortError(msg) {
-        return new domException.DOMException(msg, "AbortError");
-      },
+        return new domException.DOMException(msg, 'AbortError');
+      }
     );
     core.registerErrorBuilder(
-      "DOMExceptionInvalidCharacterError",
+      'DOMExceptionInvalidCharacterError',
       function DOMExceptionInvalidCharacterError(msg) {
-        return new domException.DOMException(msg, "InvalidCharacterError");
-      },
+        return new domException.DOMException(msg, 'InvalidCharacterError');
+      }
     );
     core.registerErrorBuilder(
-      "DOMExceptionDataError",
+      'DOMExceptionDataError',
       function DOMExceptionDataError(msg) {
-        return new domException.DOMException(msg, "DataError");
-      },
+        return new domException.DOMException(msg, 'DataError');
+      }
     );
   }
 
@@ -297,7 +296,7 @@ delete Object.prototype.__proto__;
       webidl.illegalConstructor();
     }
 
-    [SymbolFor("Deno.privateCustomInspect")](inspect) {
+    [SymbolFor('Deno.privateCustomInspect')](inspect) {
       return `${this.constructor.name} ${inspect({})}`;
     }
   }
@@ -331,7 +330,7 @@ delete Object.prototype.__proto__;
       webidl.illegalConstructor();
     }
 
-    [SymbolFor("Deno.privateCustomInspect")](inspect) {
+    [SymbolFor('Deno.privateCustomInspect')](inspect) {
       return `${this.constructor.name} ${inspect({})}`;
     }
   }
@@ -362,13 +361,11 @@ delete Object.prototype.__proto__;
   const windowOrWorkerGlobalScope = {
     Blob: util.nonEnumerable(file.Blob),
     ByteLengthQueuingStrategy: util.nonEnumerable(
-      streams.ByteLengthQueuingStrategy,
+      streams.ByteLengthQueuingStrategy
     ),
     CloseEvent: util.nonEnumerable(CloseEvent),
     CompressionStream: util.nonEnumerable(compression.CompressionStream),
-    CountQueuingStrategy: util.nonEnumerable(
-      streams.CountQueuingStrategy,
-    ),
+    CountQueuingStrategy: util.nonEnumerable(streams.CountQueuingStrategy),
     CryptoKey: util.nonEnumerable(crypto.CryptoKey),
     CustomEvent: util.nonEnumerable(CustomEvent),
     DecompressionStream: util.nonEnumerable(compression.DecompressionStream),
@@ -388,7 +385,7 @@ delete Object.prototype.__proto__;
     ProgressEvent: util.nonEnumerable(ProgressEvent),
     ReadableStream: util.nonEnumerable(streams.ReadableStream),
     ReadableStreamDefaultReader: util.nonEnumerable(
-      streams.ReadableStreamDefaultReader,
+      streams.ReadableStreamDefaultReader
     ),
     Request: util.nonEnumerable(fetch.Request),
     Response: util.nonEnumerable(fetch.Response),
@@ -406,32 +403,32 @@ delete Object.prototype.__proto__;
     Worker: util.nonEnumerable(worker.Worker),
     WritableStream: util.nonEnumerable(streams.WritableStream),
     WritableStreamDefaultWriter: util.nonEnumerable(
-      streams.WritableStreamDefaultWriter,
+      streams.WritableStreamDefaultWriter
     ),
     WritableStreamDefaultController: util.nonEnumerable(
-      streams.WritableStreamDefaultController,
+      streams.WritableStreamDefaultController
     ),
     ReadableByteStreamController: util.nonEnumerable(
-      streams.ReadableByteStreamController,
+      streams.ReadableByteStreamController
     ),
     ReadableStreamBYOBReader: util.nonEnumerable(
-      streams.ReadableStreamBYOBReader,
+      streams.ReadableStreamBYOBReader
     ),
     ReadableStreamBYOBRequest: util.nonEnumerable(
-      streams.ReadableStreamBYOBRequest,
+      streams.ReadableStreamBYOBRequest
     ),
     ReadableStreamDefaultController: util.nonEnumerable(
-      streams.ReadableStreamDefaultController,
+      streams.ReadableStreamDefaultController
     ),
     TransformStreamDefaultController: util.nonEnumerable(
-      streams.TransformStreamDefaultController,
+      streams.TransformStreamDefaultController
     ),
     atob: util.writable(base64.atob),
     btoa: util.writable(base64.btoa),
     clearInterval: util.writable(timers.clearInterval),
     clearTimeout: util.writable(timers.clearTimeout),
     console: util.nonEnumerable(
-      new Console((msg, level) => core.print(msg, level > 1)),
+      new Console((msg, level) => core.print(msg, level > 1))
     ),
     crypto: util.readOnly(crypto.crypto),
     Crypto: util.nonEnumerable(crypto.Crypto),
@@ -531,7 +528,7 @@ delete Object.prototype.__proto__;
 
   function bootstrapMainRuntime(runtimeOptions) {
     if (hasBootstrapped) {
-      throw new Error("Worker runtime already bootstrapped");
+      throw new Error('Worker runtime already bootstrapped');
     }
 
     const consoleFromV8 = window.console;
@@ -540,7 +537,7 @@ delete Object.prototype.__proto__;
     // Remove bootstrapping data from the global scope
     delete globalThis.__bootstrap;
     delete globalThis.bootstrap;
-    util.log("bootstrapMainRuntime");
+    util.log('bootstrapMainRuntime');
     hasBootstrapped = true;
     ObjectDefineProperties(globalThis, windowOrWorkerGlobalScope);
     if (runtimeOptions.unstableFlag) {
@@ -554,16 +551,16 @@ delete Object.prototype.__proto__;
 
     eventTarget.setEventTargetData(globalThis);
 
-    defineEventHandler(window, "error");
-    defineEventHandler(window, "load");
-    defineEventHandler(window, "unload");
+    defineEventHandler(window, 'error');
+    defineEventHandler(window, 'load');
+    defineEventHandler(window, 'unload');
 
-    const isUnloadDispatched = SymbolFor("isUnloadDispatched");
+    const isUnloadDispatched = SymbolFor('isUnloadDispatched');
     // Stores the flag for checking whether unload is dispatched or not.
     // This prevents the recursive dispatches of unload events.
     // See https://github.com/denoland/deno/issues/9201.
     window[isUnloadDispatched] = false;
-    window.addEventListener("unload", () => {
+    window.addEventListener('unload', () => {
       window[isUnloadDispatched] = true;
     });
 
@@ -586,7 +583,7 @@ delete Object.prototype.__proto__;
     numCpus = cpuCount;
     registerErrors();
 
-    const internalSymbol = Symbol("Deno.internal");
+    const internalSymbol = Symbol('Deno.internal');
 
     const finalDenoNs = {
       core,
@@ -610,20 +607,20 @@ delete Object.prototype.__proto__;
 
     // Setup `Deno` global - we're actually overriding already existing global
     // `Deno` with `Deno` namespace from "./deno.ts".
-    ObjectDefineProperty(globalThis, "Deno", util.readOnly(finalDenoNs));
+    ObjectDefineProperty(globalThis, 'Deno', util.readOnly(finalDenoNs));
     ObjectFreeze(globalThis.Deno.core);
 
-    util.log("args", args);
+    util.log('args', args);
   }
 
   function bootstrapWorkerRuntime(
     runtimeOptions,
     name,
     useDenoNamespace,
-    internalName,
+    internalName
   ) {
     if (hasBootstrapped) {
-      throw new Error("Worker runtime already bootstrapped");
+      throw new Error('Worker runtime already bootstrapped');
     }
 
     const consoleFromV8 = window.console;
@@ -632,7 +629,7 @@ delete Object.prototype.__proto__;
     // Remove bootstrapping data from the global scope
     delete globalThis.__bootstrap;
     delete globalThis.bootstrap;
-    util.log("bootstrapWorkerRuntime");
+    util.log('bootstrapWorkerRuntime');
     hasBootstrapped = true;
     ObjectDefineProperties(globalThis, windowOrWorkerGlobalScope);
     if (runtimeOptions.unstableFlag) {
@@ -643,8 +640,8 @@ delete Object.prototype.__proto__;
     if (runtimeOptions.enableTestingFeaturesFlag) {
       ObjectDefineProperty(
         globalThis,
-        "importScripts",
-        util.writable(importScripts),
+        'importScripts',
+        util.writable(importScripts)
       );
     }
     ObjectSetPrototypeOf(globalThis, DedicatedWorkerGlobalScope.prototype);
@@ -654,13 +651,10 @@ delete Object.prototype.__proto__;
 
     eventTarget.setEventTargetData(globalThis);
 
-    defineEventHandler(self, "message");
-    defineEventHandler(self, "error", undefined, true);
+    defineEventHandler(self, 'message');
+    defineEventHandler(self, 'error', undefined, true);
 
-    runtimeStart(
-      runtimeOptions,
-      internalName ?? name,
-    );
+    runtimeStart(runtimeOptions, internalName ?? name);
     const {
       unstableFlag,
       pid,
@@ -678,7 +672,7 @@ delete Object.prototype.__proto__;
 
     globalThis.pollForMessages = pollForMessages;
 
-    const internalSymbol = Symbol("Deno.internal");
+    const internalSymbol = Symbol('Deno.internal');
 
     const finalDenoNs = {
       core,
@@ -699,7 +693,7 @@ delete Object.prototype.__proto__;
       });
       // Setup `Deno` global - we're actually overriding already
       // existing global `Deno` with `Deno` namespace from "./deno.ts".
-      ObjectDefineProperty(globalThis, "Deno", util.readOnly(finalDenoNs));
+      ObjectDefineProperty(globalThis, 'Deno', util.readOnly(finalDenoNs));
       ObjectFreeze(globalThis.Deno.core);
     } else {
       delete globalThis.Deno;
