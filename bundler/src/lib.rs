@@ -1,26 +1,27 @@
 mod config;
 mod hook;
 mod loader;
+mod minify;
 mod options;
+mod output;
 mod resolver;
 
 use askama::Template;
 use config::TsConfig;
-use deno_ast::swc;
+use deno_ast::swc::{
+    self,
+    bundler::Bundler,
+    common::{FileName, FilePathMapping, Globals, SourceMap, GLOBALS},
+};
 use deno_core::{anyhow::Context, error::AnyError, ModuleSpecifier};
 use deno_utils::{ModuleStore, UniversalModuleLoader};
 use derive_builder::Builder;
 use hook::BundleHook;
 use loader::BundleLoader;
+use minify::minify;
+use output::gen_code;
 use resolver::BundleResolver;
 use std::{collections::HashMap, rc::Rc, sync::Arc};
-
-const IGNORE_DIRECTIVES: &[&str] = &[
-    "// deno-fmt-ignore-file",
-    "// deno-lint-ignore-file",
-    "// This code was bundled using `deno-bundler` and it's not recommended to edit it manually",
-    "",
-];
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BundleType {
@@ -41,6 +42,7 @@ pub struct BundleOptions {
     pub ts_config: TsConfig,
     pub emit_ignore_directives: bool,
     pub module_store: Option<Arc<dyn ModuleStore>>,
+    pub minify: bool,
 }
 
 #[derive(Template)]
@@ -73,86 +75,50 @@ pub async fn bundle(
     .await;
     let graph = &graph_owned;
 
-    let globals = swc::common::Globals::new();
-    deno_ast::swc::common::GLOBALS.set(&globals, || {
+    let globals = Globals::new();
+    GLOBALS.set(&globals, || {
         let emit_options: deno_ast::EmitOptions = options.ts_config.into();
-        let source_map_config = deno_ast::SourceMapConfig {
-            inline_sources: emit_options.inline_sources,
-        };
 
-        let cm = Rc::new(swc::common::SourceMap::new(
-            swc::common::FilePathMapping::empty(),
-        ));
+        let cm = Rc::new(SourceMap::new(FilePathMapping::empty()));
         let loader = BundleLoader::new(cm.clone(), &emit_options, graph);
         let resolver = BundleResolver(graph);
         let config = swc::bundler::Config {
             module: options.bundle_type.into(),
+            disable_fixer: options.minify,
+            disable_hygiene: options.minify,
             ..Default::default()
         };
         // This hook will rewrite the `import.meta` when bundling to give a consistent
         // behavior between bundled and unbundled code.
         let hook = Box::new(BundleHook);
-        let mut bundler =
-            swc::bundler::Bundler::new(&globals, cm.clone(), loader, resolver, config, hook);
+        let mut bundler = Bundler::new(&globals, cm.clone(), loader, resolver, config, hook);
         let mut entries = HashMap::new();
         entries.insert(
             "bundle".to_string(),
-            swc::common::FileName::Url(graph.roots[0].0.clone()),
+            FileName::Url(graph.roots[0].0.clone()),
         );
-        let output = bundler
+        let mut modules = bundler
             .bundle(entries)
             .context("Unable to output during bundling.")?;
-        let mut buf = Vec::new();
-        let mut srcmap = Vec::new();
-        {
-            let cfg = swc::codegen::Config { minify: true };
-            let mut wr = Box::new(swc::codegen::text_writer::JsWriter::new(
-                cm.clone(),
-                "\n",
-                &mut buf,
-                Some(&mut srcmap),
-            ));
 
-            if options.emit_ignore_directives {
-                // write leading comments in bundled file
-                use swc::codegen::text_writer::WriteJs;
-                let cmt = IGNORE_DIRECTIVES.join("\n") + "\n";
-                wr.write_comment(&cmt)?;
-            }
+        if options.minify {
+            modules = minify(cm.clone(), modules);
+        }
 
-            let mut emitter = swc::codegen::Emitter {
-                cfg,
-                cm: cm.clone(),
-                comments: None,
-                wr,
-            };
-            emitter
-                .emit_module(&output[0].module)
-                .context("Unable to emit during bundling.")?;
-        }
-        let mut code = String::from_utf8(buf).context("Emitted code is an invalid string.")?;
-        let mut maybe_map: Option<String> = None;
-        {
-            let mut buf = Vec::new();
-            cm.build_source_map_with_config(&mut srcmap, None, source_map_config)
-                .to_writer(&mut buf)?;
-            if emit_options.inline_source_map {
-                let encoded_map = format!(
-                    "//# sourceMappingURL=data:application/json;base64,{}\n",
-                    base64::encode(buf)
-                );
-                code.push_str(&encoded_map);
-            } else if emit_options.source_map {
-                maybe_map = Some(String::from_utf8(buf)?);
-            }
-        }
+        let (mut code, may_map) = gen_code(
+            cm,
+            &modules[0],
+            &emit_options,
+            options.emit_ignore_directives,
+            options.minify,
+        )?;
 
         let tpl = BundledJs {
             body: code,
             bundle_type: options.bundle_type,
         };
         code = tpl.render()?;
-        Ok((code, maybe_map))
+        Ok((code, may_map))
     })
 }
 
