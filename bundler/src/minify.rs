@@ -31,7 +31,7 @@ pub fn minify(cm: Lrc<SourceMap>, modules: Vec<Bundle>) -> Vec<Bundle> {
                     ..Default::default()
                 },
                 &ExtraOptions {
-                    top_level_mark: Mark::new(),
+                    top_level_mark: Mark::fresh(Mark::root()),
                 },
             );
             b.module.visit_mut_with(&mut fixer(None));
