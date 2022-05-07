@@ -146,8 +146,10 @@ impl MainWorker {
             deno_webstorage::init(options.origin_storage_dir.clone()),
             deno_broadcast_channel::init(options.broadcast_channel.clone(), unstable),
             deno_crypto::init(options.seed),
+            #[cfg(feature = "ext_webgpu")]
             deno_webgpu::init(unstable),
             // ffi
+            #[cfg(feature = "ext_ffi")]
             deno_ffi::init::<Permissions>(unstable),
             // Runtime ops
             // ops::runtime::init(main_module.clone()),

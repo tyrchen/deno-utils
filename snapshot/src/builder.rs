@@ -1,6 +1,5 @@
-use anyhow::Result;
 use deno_broadcast_channel::InMemoryBroadcastChannel;
-use deno_core::{Extension, JsRuntime, RuntimeOptions};
+use deno_core::{anyhow::Result, Extension, JsRuntime, RuntimeOptions};
 use deno_web::BlobStore;
 use std::{env, path::PathBuf};
 
@@ -36,9 +35,11 @@ pub fn _create_snapshot(
         deno_websocket::init::<Permissions>("".to_owned(), None, None),
         deno_webstorage::init(None),
         deno_crypto::init(None),
+        #[cfg(feature = "build_webgpu")]
         deno_webgpu::init(false),
         deno_broadcast_channel::init(InMemoryBroadcastChannel::default(), false),
         deno_tls::init(),
+        #[cfg(feature = "build_ffi")]
         deno_ffi::init::<Permissions>(false),
         deno_net::init::<Permissions>(
             None, false, // No --unstable.

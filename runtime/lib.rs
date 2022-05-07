@@ -5,12 +5,14 @@ pub use deno_console;
 pub use deno_core;
 pub use deno_crypto;
 pub use deno_fetch;
+#[cfg(feature = "ext_ffi")]
 pub use deno_ffi;
 pub use deno_http;
 pub use deno_net;
 pub use deno_tls;
 pub use deno_url;
 pub use deno_web;
+#[cfg(feature = "ext_webgpu")]
 pub use deno_webgpu;
 pub use deno_webidl;
 pub use deno_websocket;

@@ -1,5 +1,5 @@
 // Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
-"use strict";
+'use strict';
 
 ((window) => {
   const core = window.Deno.core;
@@ -141,10 +141,10 @@
     HttpClient: __bootstrap.fetch.HttpClient,
     createHttpClient: __bootstrap.fetch.createHttpClient,
     http: __bootstrap.http,
-    dlopen: __bootstrap.ffi.dlopen,
-    UnsafePointer: __bootstrap.ffi.UnsafePointer,
-    UnsafePointerView: __bootstrap.ffi.UnsafePointerView,
-    UnsafeFnPointer: __bootstrap.ffi.UnsafeFnPointer,
+    // dlopen: __bootstrap.ffi.dlopen,
+    // UnsafePointer: __bootstrap.ffi.UnsafePointer,
+    // UnsafePointerView: __bootstrap.ffi.UnsafePointerView,
+    // UnsafeFnPointer: __bootstrap.ffi.UnsafeFnPointer,
     flock: __bootstrap.fs.flock,
     flockSync: __bootstrap.fs.flockSync,
     funlock: __bootstrap.fs.funlock,

@@ -1264,6 +1264,7 @@ impl deno_websocket::WebSocketPermissions for Permissions {
     }
 }
 
+#[cfg(feature = "ext_ffi")]
 impl deno_ffi::FfiPermissions for Permissions {
     fn check(&mut self, path: Option<&Path>) -> Result<(), AnyError> {
         self.ffi.check(path)

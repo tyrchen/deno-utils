@@ -1,3 +1,4 @@
+#[cfg(feature = "build_ffi")]
 use deno_ffi::FfiPermissions;
 use deno_net::NetPermissions;
 use deno_web::TimersPermission;
@@ -38,6 +39,7 @@ impl TimersPermission for Permissions {
     }
 }
 
+#[cfg(feature = "build_ffi")]
 impl FfiPermissions for Permissions {
     fn check(&mut self, _path: Option<&Path>) -> Result<(), deno_core::error::AnyError> {
         unreachable!("snapshotting!")
