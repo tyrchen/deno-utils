@@ -725,7 +725,7 @@ dependencies = [
 
 [[package]]
 name = "deno-bundler"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "askama",
  "base64 0.13.0",

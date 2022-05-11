@@ -133,7 +133,7 @@ mod tests {
     #[tokio::test]
     async fn bundle_code_module_should_work() {
         let options = BundleOptions::default();
-        let f = Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/main.ts");
+        let f = Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/01_main.ts");
         let f = f.to_string_lossy().to_string();
         let m = resolve_url_or_path(&f).unwrap();
         let (_bundle, _) = bundle(m.clone(), options.clone()).await.unwrap();
@@ -151,7 +151,7 @@ mod tests {
             bundle_type: BundleType::Classic,
             ..BundleOptions::default()
         };
-        let f = Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/main.ts");
+        let f = Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/02_global.ts");
         let f = f.to_string_lossy().to_string();
         let m = resolve_url_or_path(&f).unwrap();
         let ret = bundle(m.clone(), options.clone()).await;
@@ -164,7 +164,7 @@ mod tests {
             bundle_type: BundleType::MainModule,
             ..BundleOptions::default()
         };
-        let f = Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/main.ts");
+        let f = Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/01_main.ts");
         let f = f.to_string_lossy().to_string();
         let m = resolve_url_or_path(&f).unwrap();
         let ret = bundle(m.clone(), options.clone()).await;

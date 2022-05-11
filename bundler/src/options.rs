@@ -19,7 +19,7 @@ impl From<BundleType> for swc::bundler::ModuleType {
         match bundle_type {
             BundleType::Classic => Self::Iife,
             BundleType::Module => Self::Es,
-            BundleType::MainModule => Self::Es,
+            BundleType::MainModule => Self::Iife,
         }
     }
 }

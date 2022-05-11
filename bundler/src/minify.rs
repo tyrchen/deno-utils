@@ -4,7 +4,7 @@ use swc::{
     common::{sync::Lrc, Mark, SourceMap},
     minifier::{
         optimize,
-        option::{CompressOptions, ExtraOptions, MangleOptions, MinifyOptions, TopLevelOptions},
+        option::{ExtraOptions, MangleOptions, MinifyOptions},
     },
     transforms::fixer,
     visit::VisitMutWith,
@@ -20,10 +20,9 @@ pub fn minify(cm: Lrc<SourceMap>, modules: Vec<Bundle>) -> Vec<Bundle> {
                 None,
                 None,
                 &MinifyOptions {
-                    compress: Some(CompressOptions {
-                        top_level: Some(TopLevelOptions { functions: true }),
-                        ..Default::default()
-                    }),
+                    // FIXME: use compress option
+                    // currently it would cause module compiling issue
+                    compress: None,
                     mangle: Some(MangleOptions {
                         top_level: true,
                         ..Default::default()
