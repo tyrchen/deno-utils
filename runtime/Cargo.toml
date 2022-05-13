@@ -2,7 +2,7 @@
 
 [package]
 name = "deno_simple_runtime"
-version = "0.59.2"
+version = "0.60.0"
 authors = ["the Deno authors"]
 edition = "2021"
 license = "MIT"
@@ -34,21 +34,21 @@ winapi = "0.3.9"
 [dependencies]
 derive_builder = "0.11.2"
 
-deno_broadcast_channel = "0.45.0"
-deno_console = "0.51.0"
-deno_core = "0.133.0"
-deno_crypto = "0.65.0"
-deno_fetch = "0.74.0"
-deno_ffi = { version = "0.38.0", optional = true }
-deno_http = "0.45.0"
-deno_net = "0.43.0"
-deno_tls = "0.38.0"
-deno_url = "0.51.0"
-deno_web = "0.82.0"
-deno_webgpu = { version = "0.52.0", optional = true }
-deno_webidl = "0.51.0"
-deno_websocket = "0.56.0"
-deno_webstorage = "0.46.0"
+deno_broadcast_channel = "0.46.0"
+deno_console = "0.52.0"
+deno_core = "0.134.0"
+deno_crypto = "0.66.0"
+deno_fetch = "0.75.0"
+deno_ffi = { version = "0.39.0", optional = true }
+deno_http = "0.46.0"
+deno_net = "0.44.0"
+deno_tls = "0.39.0"
+deno_url = "0.52.0"
+deno_web = "0.83.0"
+deno_webgpu = { version = "0.53.0", optional = true }
+deno_webidl = "0.52.0"
+deno_websocket = "0.57.0"
+deno_webstorage = "0.47.0"
 
 
 atty = "0.2.14"

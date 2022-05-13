@@ -343,6 +343,7 @@ impl MainWorker {
     ) -> T {
         loop {
             tokio::select! {
+              biased;
               result = &mut fut => {
                 return result;
               }

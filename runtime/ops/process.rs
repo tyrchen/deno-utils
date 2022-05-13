@@ -90,10 +90,7 @@ impl StdioOrRid {
     pub fn as_stdio(&self, state: &mut OpState) -> Result<std::process::Stdio, AnyError> {
         match &self {
             StdioOrRid::Stdio(val) => Ok(val.as_stdio()),
-            StdioOrRid::Rid(rid) => {
-                let file = StdFileResource::clone_file(state, *rid)?;
-                Ok(file.into())
-            }
+            StdioOrRid::Rid(rid) => StdFileResource::as_stdio(state, *rid),
         }
     }
 }
