@@ -29,7 +29,7 @@ impl Default for BundleOptions {
         Self {
             bundle_type: BundleType::Module,
             ts_config: get_ts_config(ConfigType::Bundle).unwrap(),
-            emit_ignore_directives: true,
+            emit_ignore_directives: false,
             module_store: Some(Arc::new(FsModuleStore::default())),
             minify: true,
         }
