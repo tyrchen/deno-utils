@@ -73,22 +73,27 @@ pub struct ChildStdio {
 pub struct ChildStatus {
     success: bool,
     code: i32,
-    signal: Option<i32>,
+    signal: Option<String>,
 }
 
-impl From<std::process::ExitStatus> for ChildStatus {
-    fn from(status: ExitStatus) -> Self {
+impl TryFrom<std::process::ExitStatus> for ChildStatus {
+    type Error = AnyError;
+
+    fn try_from(status: ExitStatus) -> Result<Self, Self::Error> {
         let code = status.code();
         #[cfg(unix)]
         let signal = status.signal();
         #[cfg(not(unix))]
-        let signal = None;
+        let signal: Option<i32> = None;
 
-        if let Some(signal) = signal {
+        let status = if let Some(signal) = signal {
             ChildStatus {
                 success: false,
                 code: 128 + signal,
-                signal: Some(signal),
+                #[cfg(unix)]
+                signal: Some(crate::ops::signal::signal_int_to_str(signal)?.to_string()),
+                #[cfg(not(unix))]
+                signal: None,
             }
         } else {
             let code = code.expect("Should have either an exit code or a signal.");
@@ -98,7 +103,9 @@ impl From<std::process::ExitStatus> for ChildStatus {
                 code,
                 signal: None,
             }
-        }
+        };
+
+        Ok(status)
     }
 }
 
@@ -213,13 +220,13 @@ async fn op_spawn_wait(
         .borrow_mut()
         .resource_table
         .take::<ChildResource>(rid)?;
-    Ok(Rc::try_unwrap(resource)
+    Rc::try_unwrap(resource)
         .ok()
         .unwrap()
         .0
         .wait()
         .await?
-        .into())
+        .try_into()
 }
 
 #[op]
@@ -229,7 +236,7 @@ fn op_spawn_sync(state: &mut OpState, args: SpawnArgs) -> Result<SpawnOutput, An
     let output = create_command(state, args)?.output()?;
 
     Ok(SpawnOutput {
-        status: output.status.into(),
+        status: output.status.try_into()?,
         stdout: if stdout {
             Some(output.stdout.into())
         } else {

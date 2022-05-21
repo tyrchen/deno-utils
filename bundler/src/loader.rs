@@ -5,7 +5,7 @@ use deno_ast::{
         common::{comments::SingleThreadedComments, FileName, Mark, SourceMap, Spanned},
         parser::{error::Error as SwcError, lexer::Lexer, StringInput},
     },
-    Diagnostic, LineAndColumnDisplay, MediaType,
+    Diagnostic, LineAndColumnDisplay, MediaType, SourceRangedForSpanned,
 };
 
 use deno_core::{anyhow::anyhow, error::AnyError, ModuleSpecifier};
@@ -44,7 +44,7 @@ impl swc::bundler::Load for BundleLoader<'_> {
                 if let Some(m) = self.graph.get(specifier) {
                     let (fm, module) = transpile_module(
                         specifier,
-                        m.maybe_source.as_ref().map(|s| s.as_str()).unwrap_or(""),
+                        m.maybe_source.as_ref().map(|s| s.as_ref()).unwrap_or(""),
                         m.media_type,
                         self.emit_options,
                         self.cm.clone(),
@@ -140,7 +140,7 @@ fn swc_err_to_diagnostic(
     let location = source_map.lookup_char_pos(err.span().lo);
     Diagnostic {
         specifier: specifier.to_string(),
-        span: err.span(),
+        range: err.range(),
         display_position: LineAndColumnDisplay {
             line_number: location.line,
             column_number: location.col_display + 1,

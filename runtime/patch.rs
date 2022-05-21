@@ -20,6 +20,7 @@ impl Default for BootstrapOptions {
             unstable: false,
             no_color: false,
             is_tty: false,
+            user_agent: USER_AGENT.to_string(),
         }
     }
 }
@@ -30,7 +31,6 @@ impl Default for WorkerOptions {
             bootstrap: BootstrapOptions::default(),
             unsafely_ignore_certificate_errors: None,
             root_cert_store: None,
-            user_agent: USER_AGENT.to_string(),
             seed: None,
             format_js_error_fn: None,
             module_loader: Rc::new(FsModuleLoader),

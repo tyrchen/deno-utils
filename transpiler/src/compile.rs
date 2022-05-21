@@ -7,7 +7,7 @@ pub fn compile(m: &ModuleSpecifier, code: String, minify: bool) -> Result<String
     let media_type = MediaType::from(m);
     let params = ParseParams {
         specifier: m.to_string(),
-        source: SourceTextInfo::from_string(code),
+        text_info: SourceTextInfo::from_string(code),
         media_type,
         capture_tokens: false,
         scope_analysis: false,

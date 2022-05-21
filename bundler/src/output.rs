@@ -20,12 +20,14 @@ pub fn gen_code(
 ) -> Result<(String, Option<String>), AnyError> {
     let source_map_config = deno_ast::SourceMapConfig {
         inline_sources: emit_options.inline_sources,
-        maybe_base: None,
     };
     let mut buf = Vec::new();
     let mut srcmap = Vec::new();
     {
-        let cfg = swc::codegen::Config { minify };
+        let cfg = swc::codegen::Config {
+            minify,
+            ..Default::default()
+        };
         let mut wr = Box::new(swc::codegen::text_writer::JsWriter::new(
             cm.clone(),
             "\n",

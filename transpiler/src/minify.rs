@@ -11,6 +11,7 @@ use deno_ast::swc::{
 
 pub(crate) fn minify_module(program: Module) -> Module {
     let top_level_mark = Mark::fresh(Mark::root());
+    let unresolved_mark = Mark::fresh(Mark::root());
     let cm = Rc::new(SourceMap::default());
     let options = MinifyOptions {
         compress: Some(Default::default()),
@@ -26,6 +27,9 @@ pub(crate) fn minify_module(program: Module) -> Module {
         None,
         None,
         &options,
-        &ExtraOptions { top_level_mark },
+        &ExtraOptions {
+            top_level_mark,
+            unresolved_mark,
+        },
     )
 }

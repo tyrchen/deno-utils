@@ -2,7 +2,7 @@
 
 [package]
 name = "deno_simple_runtime"
-version = "0.60.0"
+version = "0.61.0"
 authors = ["the Deno authors"]
 edition = "2021"
 license = "MIT"
@@ -25,7 +25,7 @@ name = "hello_runtime"
 path = "examples/hello_runtime.rs"
 
 [build-dependencies]
-deno-snapshot = { version = "0.4.0", features = ["build"], path = "../snapshot" }
+deno-snapshot = { version = "0.5.0", features = ["build"], path = "../snapshot" }
 
 [target.'cfg(windows)'.build-dependencies]
 winres = "0.1.12"
@@ -34,21 +34,21 @@ winapi = "0.3.9"
 [dependencies]
 derive_builder = "0.11.2"
 
-deno_broadcast_channel = "0.46.0"
-deno_console = "0.52.0"
-deno_core = "0.134.0"
-deno_crypto = "0.66.0"
-deno_fetch = "0.75.0"
-deno_ffi = { version = "0.39.0", optional = true }
-deno_http = "0.46.0"
-deno_net = "0.44.0"
-deno_tls = "0.39.0"
-deno_url = "0.52.0"
-deno_web = "0.83.0"
-deno_webgpu = { version = "0.53.0", optional = true }
-deno_webidl = "0.52.0"
-deno_websocket = "0.57.0"
-deno_webstorage = "0.47.0"
+deno_broadcast_channel = "0.47.0"
+deno_console = "0.53.0"
+deno_core = "0.135.0"
+deno_crypto = "0.67.0"
+deno_fetch = "0.76.0"
+deno_ffi = { version = "0.40.0", optional = true }
+deno_http = "0.47.0"
+deno_net = "0.45.0"
+deno_tls = "0.40.0"
+deno_url = "0.53.0"
+deno_web = "0.84.0"
+deno_webgpu = { version = "0.54.0", optional = true }
+deno_webidl = "0.53.0"
+deno_websocket = "0.58.0"
+deno_webstorage = "0.48.0"
 
 
 atty = "0.2.14"
@@ -58,12 +58,12 @@ filetime = "0.2.16"
 fs3 = "0.5.0"
 http = "0.2.7"
 hyper = { version = "0.14.18", features = ["server", "stream", "http1", "http2", "runtime"] }
-libc = "0.2.125"
+libc = "0.2.126"
 log = "0.4.17"
 netif = "0.1.3"
 notify = "5.0.0-pre.15"
-once_cell = "1.10.0"
-regex = "1.5.5"
+once_cell = "1.11.0"
+regex = "1.5.6"
 ring = "0.16.20"
 serde = { version = "1.0.137", features = ["derive"] }
 signal-hook-registry = "1.4.0"
@@ -72,7 +72,7 @@ termcolor = "1.1.3"
 tokio = { version = "1.18.2", features = ["full"] }
 uuid = { version = "1.0.0", features = ["v4"] }
 
-deno-snapshot = { version = "0.4.0", path = "../snapshot" }
+deno-snapshot = { version = "0.5.0", path = "../snapshot" }
 
 [target.'cfg(windows)'.dependencies]
 fwdansi = "1.1.0"

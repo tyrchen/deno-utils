@@ -103,7 +103,7 @@ impl Loader for UniversalModuleLoader {
         async move {
             let code = loader.get_and_update_source(&m, false).await?;
             Ok(Some(LoadResponse::Module {
-                content: Arc::new(code),
+                content: code.into(),
                 specifier: m,
                 maybe_headers: None,
             }))

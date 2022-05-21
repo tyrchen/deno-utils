@@ -30,6 +30,7 @@ pub fn minify(cm: Lrc<SourceMap>, modules: Vec<Bundle>) -> Vec<Bundle> {
                     ..Default::default()
                 },
                 &ExtraOptions {
+                    unresolved_mark: Mark::fresh(Mark::root()),
                     top_level_mark: Mark::fresh(Mark::root()),
                 },
             );

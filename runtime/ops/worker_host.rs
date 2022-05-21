@@ -36,7 +36,6 @@ pub struct CreateWebWorkerArgs {
     pub parent_permissions: Permissions,
     pub permissions: Permissions,
     pub main_module: ModuleSpecifier,
-    pub use_deno_namespace: bool,
     pub worker_type: WebWorkerType,
     pub maybe_exit_code: Option<Arc<AtomicI32>>,
 }
@@ -128,7 +127,6 @@ pub struct CreateWorkerArgs {
     permissions: Option<ChildPermissionsArg>,
     source_code: String,
     specifier: String,
-    use_deno_namespace: bool,
     worker_type: WebWorkerType,
 }
 
@@ -142,10 +140,6 @@ fn op_create_worker(state: &mut OpState, args: CreateWorkerArgs) -> Result<Worke
         None
     };
     let args_name = args.name;
-    let use_deno_namespace = args.use_deno_namespace;
-    if use_deno_namespace {
-        super::check_unstable(state, "Worker.deno.namespace");
-    }
     let worker_type = args.worker_type;
     if let WebWorkerType::Classic = worker_type {
         if let TestingFeaturesEnabled(false) = state.borrow() {
@@ -202,7 +196,6 @@ fn op_create_worker(state: &mut OpState, args: CreateWorkerArgs) -> Result<Worke
             parent_permissions,
             permissions: worker_permissions,
             main_module: module_specifier.clone(),
-            use_deno_namespace,
             worker_type,
             maybe_exit_code,
         });
@@ -243,13 +236,12 @@ fn op_create_worker(state: &mut OpState, args: CreateWorkerArgs) -> Result<Worke
 }
 
 #[op]
-fn op_host_terminate_worker(state: &mut OpState, id: WorkerId) -> Result<(), AnyError> {
+fn op_host_terminate_worker(state: &mut OpState, id: WorkerId) {
     if let Some(worker_thread) = state.borrow_mut::<WorkersTable>().remove(&id) {
         worker_thread.terminate();
     } else {
         debug!("tried to terminate non-existent worker {}", id);
     }
-    Ok(())
 }
 
 enum WorkerChannel {
