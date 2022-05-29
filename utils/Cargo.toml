@@ -1,6 +1,6 @@
 [package]
 name = "deno-utils"
-version = "0.5.0"
+version = "0.5.1"
 edition = "2021"
 license = "MIT"
 documentation = "https://docs.rs/deno-utils"
@@ -18,7 +18,7 @@ categories = ["development-tools"]
 [dependencies]
 async-trait = "0.1.53"
 data-url = "0.1.1"
-deno_core = "0.135.0"
+deno_core = "0.136.0"
 deno_graph = "0.27.0"
 dirs = "4.0.0"
 futures = "0.3.21"
@@ -28,4 +28,4 @@ pin-project = "1.0.10"
 reqwest = "0.11.10"
 tokio = { version = "1.18.2", features = ["rt", "rt-multi-thread", "fs"] }
 
-deno-transpiler = { version = "0.3.0", path = "../transpiler" }
+deno-transpiler = { version = "0.3.1", path = "../transpiler" }
