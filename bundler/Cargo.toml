@@ -1,6 +1,6 @@
 [package]
 name = "deno-bundler"
-version = "0.5.1"
+version = "0.5.2"
 edition = "2021"
 license = "MIT"
 documentation = "https://docs.rs/deno-bundler"
@@ -25,7 +25,7 @@ derive_builder = "0.11.2"
 futures = "0.3.21"
 serde = { version = "1.0.137", features = ["derive"] }
 
-deno-utils = { version = "0.5.1", path = "../utils" }
+deno-utils = { version = "0.5.2", path = "../utils" }
 
 [dev-dependencies]
 tokio = { version = "1.18.2", features = ["full"] }

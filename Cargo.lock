@@ -726,7 +726,7 @@ dependencies = [
 
 [[package]]
 name = "deno-bundler"
-version = "0.5.1"
+version = "0.5.2"
 dependencies = [
  "askama",
  "base64 0.13.0",
@@ -776,7 +776,7 @@ dependencies = [
 
 [[package]]
 name = "deno-utils"
-version = "0.5.1"
+version = "0.5.2"
 dependencies = [
  "async-trait",
  "data-url",

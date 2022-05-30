@@ -1,5 +1,5 @@
-import { serve } from 'https://deno.land/std@0.134.0/http/server.ts';
-import { delay } from 'https://deno.land/x/delay@v0.2.0/mod.ts';
+import { serve } from 'https://cdn.jsdelivr.net/gh/denoland/deno_std@main/http/server.ts';
+import { delay } from 'https://cdn.jsdelivr.net/gh/deno-delay/delay@main/src/delay.ts';
 
 async function handler(req: Request): Promise<Response> {
   await delay(100);

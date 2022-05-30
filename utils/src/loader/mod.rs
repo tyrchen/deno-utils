@@ -3,7 +3,7 @@ mod universal_loader;
 use crate::ModuleStore;
 use data_url::DataUrl;
 use deno_core::{anyhow::bail, error::AnyError, ModuleSpecifier};
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
 #[derive(Clone, Debug)]
 pub struct UniversalModuleLoader {
@@ -14,7 +14,10 @@ pub struct UniversalModuleLoader {
 pub async fn get_source_code(m: &ModuleSpecifier) -> Result<String, AnyError> {
     let code = match m.scheme() {
         "http" | "https" => {
-            let res = reqwest::get(m.to_owned()).await?;
+            let client = reqwest::Client::builder()
+                .timeout(Duration::from_millis(1500))
+                .build()?;
+            let res = client.get(m.to_owned()).send().await?;
             // TODO: The HTML spec says to fail if the status is not
             // 200-299, but `error_for_status()` fails if the status is
             // 400-599.
