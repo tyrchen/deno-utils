@@ -25,7 +25,7 @@ name = "hello_runtime"
 path = "examples/hello_runtime.rs"
 
 [build-dependencies]
-deno-snapshot = { version = "0.5.1", features = ["build"], path = "../snapshot" }
+deno-snapshot = { version = "0.5.2", features = ["build"], path = "../snapshot" }
 
 [target.'cfg(windows)'.build-dependencies]
 winres = "0.1.12"
