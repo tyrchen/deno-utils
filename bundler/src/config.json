@@ -1,0 +1,8 @@
+{
+    "compress": {
+        "module": true
+    },
+    "mangle": {
+        "toplevel": true
+    }
+}

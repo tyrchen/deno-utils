@@ -8,6 +8,7 @@ use std::{sync::Arc, time::Duration};
 #[derive(Clone, Debug)]
 pub struct UniversalModuleLoader {
     store: Option<Arc<dyn ModuleStore>>,
+    #[allow(dead_code)]
     compile: bool,
 }
 
@@ -15,7 +16,7 @@ pub async fn get_source_code(m: &ModuleSpecifier) -> Result<String, AnyError> {
     let code = match m.scheme() {
         "http" | "https" => {
             let client = reqwest::Client::builder()
-                .timeout(Duration::from_millis(1500))
+                .timeout(Duration::from_millis(5000))
                 .build()?;
             let res = client.get(m.to_owned()).send().await?;
             // TODO: The HTML spec says to fail if the status is not

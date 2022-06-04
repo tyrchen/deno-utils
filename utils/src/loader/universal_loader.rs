@@ -7,9 +7,9 @@ use deno_core::ModuleSource;
 use deno_core::ModuleSourceFuture;
 use deno_core::ModuleSpecifier;
 use deno_core::ModuleType;
-use deno_graph::source::LoadFuture;
-use deno_graph::source::LoadResponse;
-use deno_graph::source::Loader;
+#[cfg(feature = "bundle")]
+use deno_graph::source::{LoadFuture, LoadResponse, Loader};
+#[cfg(feature = "transpile")]
 use deno_transpiler::compile;
 use std::path::PathBuf;
 use std::pin::Pin;
@@ -38,9 +38,11 @@ impl UniversalModuleLoader {
     pub async fn get_and_update_source(
         self,
         m: &ModuleSpecifier,
-        minify: bool,
+        #[allow(unused_variables)] minify: bool,
     ) -> Result<String, AnyError> {
+        #[allow(unused_mut)]
         let mut code = get_source_code(m).await?;
+        #[cfg(feature = "transpile")]
         if self.compile {
             code = compile(m, code, minify)?;
         }
@@ -96,6 +98,7 @@ impl ModuleLoader for UniversalModuleLoader {
     }
 }
 
+#[cfg(feature = "bundle")]
 impl Loader for UniversalModuleLoader {
     fn load(&mut self, specifier: &ModuleSpecifier, _is_dynamic: bool) -> LoadFuture {
         let loader = self.clone();
