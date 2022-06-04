@@ -1,6 +1,6 @@
 [package]
 name = "deno-bundler"
-version = "0.5.2"
+version = "0.5.3"
 edition = "2021"
 license = "MIT"
 documentation = "https://docs.rs/deno-bundler"
@@ -19,7 +19,7 @@ categories = ["development-tools::build-utils"]
 askama = "0.11.1"
 base64 = "0.13.0"
 deno_ast = { version = "0.15.0", features = ["bundler"] }
-deno_core = "0.136.0"
+deno_core = "0.137.0"
 deno_graph = "0.27.0"
 derive_builder = "0.11.2"
 futures = "0.3.21"
@@ -30,5 +30,5 @@ deno-utils = { version = "0.6.0", path = "../utils", features = ["bundle", "tran
 
 
 [dev-dependencies]
-tokio = { version = "1.18.2", features = ["full"] }
-tracing-subscriber = "0.3"
+tokio = { version = "1.19.0", features = ["full"] }
+tracing-subscriber = "0.3.11"
