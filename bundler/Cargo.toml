@@ -1,6 +1,6 @@
 [package]
 name = "deno-bundler"
-version = "0.5.4"
+version = "0.5.5"
 edition = "2021"
 license = "MIT"
 documentation = "https://docs.rs/deno-bundler"
@@ -26,7 +26,7 @@ futures = "0.3.21"
 serde = { version = "1.0.137", features = ["derive"] }
 serde_json = "1.0.81"
 
-deno-utils = { version = "0.6.0", path = "../utils", features = ["bundle", "transpile"] }
+deno-utils = { version = "0.6.1", path = "../utils", features = ["bundle", "transpile"] }
 
 
 [dev-dependencies]
