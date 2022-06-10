@@ -1,5 +1,5 @@
 // Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
-"use strict";
+'use strict';
 
 ((window) => {
   const core = window.Deno.core;
@@ -65,73 +65,256 @@
   // An async operation to $0 was started in this test, but never completed. Async operations should not complete in a test if they were not started in that test.
   // deno-fmt-ignore
   const OP_DETAILS = {
-    "op_blob_read_part": ["read from a Blob or File", "awaiting the result of a Blob or File read"],
-    "op_broadcast_recv": ["receive a message from a BroadcastChannel", "closing the BroadcastChannel"],
-    "op_broadcast_send": ["send a message to a BroadcastChannel", "closing the BroadcastChannel"],
-    "op_chmod_async": ["change the permissions of a file", "awaiting the result of a `Deno.chmod` call"],
-    "op_chown_async": ["change the owner of a file", "awaiting the result of a `Deno.chown` call"],
-    "op_copy_file_async": ["copy a file", "awaiting the result of a `Deno.copyFile` call"],
-    "op_crypto_decrypt": ["decrypt data", "awaiting the result of a `crypto.subtle.decrypt` call"],
-    "op_crypto_derive_bits": ["derive bits from a key", "awaiting the result of a `crypto.subtle.deriveBits` call"],
-    "op_crypto_encrypt": ["encrypt data", "awaiting the result of a `crypto.subtle.encrypt` call"],
-    "op_crypto_generate_key": ["generate a key", "awaiting the result of a `crypto.subtle.generateKey` call"],
-    "op_crypto_sign_key": ["sign data", "awaiting the result of a `crypto.subtle.sign` call"],
-    "op_crypto_subtle_digest": ["digest data", "awaiting the result of a `crypto.subtle.digest` call"],
-    "op_crypto_verify_key": ["verify data", "awaiting the result of a `crypto.subtle.verify` call"],
-    "op_dgram_recv": ["receive a datagram message", "awaiting the result of `Deno.DatagramConn#receive` call, or not breaking out of a for await loop looping over a `Deno.DatagramConn`"],
-    "op_dgram_send": ["send a datagram message", "awaiting the result of `Deno.DatagramConn#send` call"],
-    "op_dns_resolve": ["resolve a DNS name", "awaiting the result of a `Deno.resolveDns` call"],
-    "op_emit": ["transpile code", "awaiting the result of a `Deno.emit` call"],
-    "op_fdatasync_async": ["flush pending data operations for a file to disk", "awaiting the result of a `Deno.fdatasync` call"],
-    "op_fetch_send": ["send a HTTP request", "awaiting the result of a `fetch` call"],
-    "op_ffi_call_nonblocking": ["do a non blocking ffi call", "awaiting the returned promise"] ,
-    "op_ffi_call_ptr_nonblocking": ["do a non blocking ffi call",  "awaiting the returned promise"],
-    "op_flock_async": ["lock a file", "awaiting the result of a `Deno.flock` call"],
-    "op_fs_events_poll": ["get the next file system event", "breaking out of a for await loop looping over `Deno.FsEvents`"],
-    "op_fstat_async": ["get file metadata", "awaiting the result of a `Deno.File#fstat` call"],
-    "op_fsync_async": ["flush pending data operations for a file to disk", "awaiting the result of a `Deno.fsync` call"],
-    "op_ftruncate_async": ["truncate a file", "awaiting the result of a `Deno.ftruncate` call"],
-    "op_funlock_async": ["unlock a file", "awaiting the result of a `Deno.funlock` call"],
-    "op_futime_async": ["change file timestamps", "awaiting the result of a `Deno.futime` call"],
-    "op_http_accept": ["accept a HTTP request", "closing a `Deno.HttpConn`"],
-    "op_http_read": ["read the body of a HTTP request", "consuming the entire request body"],
-    "op_http_shutdown": ["shutdown a HTTP connection", "awaiting `Deno.HttpEvent#respondWith`"],
-    "op_http_upgrade_websocket": ["upgrade a HTTP connection to a WebSocket", "awaiting `Deno.HttpEvent#respondWith`"],
-    "op_http_write_headers": ["write HTTP response headers", "awaiting `Deno.HttpEvent#respondWith`"],
-    "op_http_write": ["write HTTP response body", "awaiting `Deno.HttpEvent#respondWith`"],
-    "op_link_async": ["create a hard link", "awaiting the result of a `Deno.link` call"],
-    "op_make_temp_dir_async": ["create a temporary directory", "awaiting the result of a `Deno.makeTempDir` call"],
-    "op_make_temp_file_async": ["create a temporary file", "awaiting the result of a `Deno.makeTempFile` call"],
-    "op_message_port_recv_message": ["receive a message from a MessagePort", "awaiting the result of not closing a `MessagePort`"],
-    "op_mkdir_async": ["create a directory", "awaiting the result of a `Deno.mkdir` call"],
-    "op_net_accept": ["accept a TCP connection", "closing a `Deno.Listener`"],
-    "op_net_connect": ["connect to a TCP or UDP server", "awaiting a `Deno.connect` call"],
-    "op_open_async": ["open a file", "awaiting the result of a `Deno.open` call"],
-    "op_read_dir_async": ["read a directory", "collecting all items in the async iterable returned from a `Deno.readDir` call"],
-    "op_read_link_async": ["read a symlink", "awaiting the result of a `Deno.readLink` call"],
-    "op_realpath_async": ["resolve a path", "awaiting the result of a `Deno.realpath` call"],
-    "op_remove_async": ["remove a file or directory", "awaiting the result of a `Deno.remove` call"],
-    "op_rename_async": ["rename a file or directory", "awaiting the result of a `Deno.rename` call"],
-    "op_run_status": ["get the status of a subprocess", "awaiting the result of a `Deno.Process#status` call"],
-    "op_seek_async": ["seek in a file", "awaiting the result of a `Deno.File#seek` call"],
-    "op_signal_poll": ["get the next signal", "un-registering a OS signal handler"],
-    "op_sleep": ["sleep for a duration", "cancelling a `setTimeout` or `setInterval` call"],
-    "op_stat_async": ["get file metadata", "awaiting the result of a `Deno.stat` call"],
-    "op_symlink_async": ["create a symlink", "awaiting the result of a `Deno.symlink` call"],
-    "op_tls_accept": ["accept a TLS connection", "closing a `Deno.TlsListener`"],
-    "op_tls_connect": ["connect to a TLS server", "awaiting a `Deno.connectTls` call"],
-    "op_tls_handshake": ["perform a TLS handshake", "awaiting a `Deno.TlsConn#handshake` call"],
-    "op_tls_start": ["start a TLS connection", "awaiting a `Deno.startTls` call"],
-    "op_truncate_async": ["truncate a file", "awaiting the result of a `Deno.truncate` call"],
-    "op_utime_async": ["change file timestamps", "awaiting the result of a `Deno.utime` call"],
-    "op_webgpu_buffer_get_map_async": ["map a WebGPU buffer", "awaiting the result of a `GPUBuffer#mapAsync` call"],
-    "op_webgpu_request_adapter": ["request a WebGPU adapter", "awaiting the result of a `navigator.gpu.requestAdapter` call"],
-    "op_webgpu_request_device": ["request a WebGPU device", "awaiting the result of a `GPUAdapter#requestDevice` call"],
-    "op_worker_recv_message":  ["receive a message from a web worker", "terminating a `Worker`"],
-    "op_ws_close": ["close a WebSocket", "awaiting until the `close` event is emitted on a `WebSocket`, or the `WebSocketStream#closed` promise resolves"],
-    "op_ws_create": ["create a WebSocket", "awaiting until the `open` event is emitted on a `WebSocket`, or the result of a `WebSocketStream#connection` promise"],
-    "op_ws_next_event": ["receive the next message on a WebSocket", "closing a `WebSocket` or `WebSocketStream`"],
-    "op_ws_send": ["send a message on a WebSocket", "closing a `WebSocket` or `WebSocketStream`"],
+    op_blob_read_part: [
+      'read from a Blob or File',
+      'awaiting the result of a Blob or File read',
+    ],
+    op_broadcast_recv: [
+      'receive a message from a BroadcastChannel',
+      'closing the BroadcastChannel',
+    ],
+    op_broadcast_send: [
+      'send a message to a BroadcastChannel',
+      'closing the BroadcastChannel',
+    ],
+    op_chmod_async: [
+      'change the permissions of a file',
+      'awaiting the result of a `Deno.chmod` call',
+    ],
+    op_chown_async: [
+      'change the owner of a file',
+      'awaiting the result of a `Deno.chown` call',
+    ],
+    op_copy_file_async: [
+      'copy a file',
+      'awaiting the result of a `Deno.copyFile` call',
+    ],
+    op_crypto_decrypt: [
+      'decrypt data',
+      'awaiting the result of a `crypto.subtle.decrypt` call',
+    ],
+    op_crypto_derive_bits: [
+      'derive bits from a key',
+      'awaiting the result of a `crypto.subtle.deriveBits` call',
+    ],
+    op_crypto_encrypt: [
+      'encrypt data',
+      'awaiting the result of a `crypto.subtle.encrypt` call',
+    ],
+    op_crypto_generate_key: [
+      'generate a key',
+      'awaiting the result of a `crypto.subtle.generateKey` call',
+    ],
+    op_crypto_sign_key: [
+      'sign data',
+      'awaiting the result of a `crypto.subtle.sign` call',
+    ],
+    op_crypto_subtle_digest: [
+      'digest data',
+      'awaiting the result of a `crypto.subtle.digest` call',
+    ],
+    op_crypto_verify_key: [
+      'verify data',
+      'awaiting the result of a `crypto.subtle.verify` call',
+    ],
+    op_dgram_recv: [
+      'receive a datagram message',
+      'awaiting the result of `Deno.DatagramConn#receive` call, or not breaking out of a for await loop looping over a `Deno.DatagramConn`',
+    ],
+    op_dgram_send: [
+      'send a datagram message',
+      'awaiting the result of `Deno.DatagramConn#send` call',
+    ],
+    op_dns_resolve: [
+      'resolve a DNS name',
+      'awaiting the result of a `Deno.resolveDns` call',
+    ],
+    op_emit: ['transpile code', 'awaiting the result of a `Deno.emit` call'],
+    op_fdatasync_async: [
+      'flush pending data operations for a file to disk',
+      'awaiting the result of a `Deno.fdatasync` call',
+    ],
+    op_fetch_send: [
+      'send a HTTP request',
+      'awaiting the result of a `fetch` call',
+    ],
+    op_ffi_call_nonblocking: [
+      'do a non blocking ffi call',
+      'awaiting the returned promise',
+    ],
+    op_ffi_call_ptr_nonblocking: [
+      'do a non blocking ffi call',
+      'awaiting the returned promise',
+    ],
+    op_flock_async: [
+      'lock a file',
+      'awaiting the result of a `Deno.flock` call',
+    ],
+    op_fs_events_poll: [
+      'get the next file system event',
+      'breaking out of a for await loop looping over `Deno.FsEvents`',
+    ],
+    op_fstat_async: [
+      'get file metadata',
+      'awaiting the result of a `Deno.File#fstat` call',
+    ],
+    op_fsync_async: [
+      'flush pending data operations for a file to disk',
+      'awaiting the result of a `Deno.fsync` call',
+    ],
+    op_ftruncate_async: [
+      'truncate a file',
+      'awaiting the result of a `Deno.ftruncate` call',
+    ],
+    op_funlock_async: [
+      'unlock a file',
+      'awaiting the result of a `Deno.funlock` call',
+    ],
+    op_futime_async: [
+      'change file timestamps',
+      'awaiting the result of a `Deno.futime` call',
+    ],
+    op_http_accept: ['accept a HTTP request', 'closing a `Deno.HttpConn`'],
+    op_http_read: [
+      'read the body of a HTTP request',
+      'consuming the entire request body',
+    ],
+    op_http_shutdown: [
+      'shutdown a HTTP connection',
+      'awaiting `Deno.HttpEvent#respondWith`',
+    ],
+    op_http_upgrade_websocket: [
+      'upgrade a HTTP connection to a WebSocket',
+      'awaiting `Deno.HttpEvent#respondWith`',
+    ],
+    op_http_write_headers: [
+      'write HTTP response headers',
+      'awaiting `Deno.HttpEvent#respondWith`',
+    ],
+    op_http_write: [
+      'write HTTP response body',
+      'awaiting `Deno.HttpEvent#respondWith`',
+    ],
+    op_link_async: [
+      'create a hard link',
+      'awaiting the result of a `Deno.link` call',
+    ],
+    op_make_temp_dir_async: [
+      'create a temporary directory',
+      'awaiting the result of a `Deno.makeTempDir` call',
+    ],
+    op_make_temp_file_async: [
+      'create a temporary file',
+      'awaiting the result of a `Deno.makeTempFile` call',
+    ],
+    op_message_port_recv_message: [
+      'receive a message from a MessagePort',
+      'awaiting the result of not closing a `MessagePort`',
+    ],
+    op_mkdir_async: [
+      'create a directory',
+      'awaiting the result of a `Deno.mkdir` call',
+    ],
+    op_net_accept: ['accept a TCP connection', 'closing a `Deno.Listener`'],
+    op_net_connect: [
+      'connect to a TCP or UDP server',
+      'awaiting a `Deno.connect` call',
+    ],
+    op_open_async: ['open a file', 'awaiting the result of a `Deno.open` call'],
+    op_read_dir_async: [
+      'read a directory',
+      'collecting all items in the async iterable returned from a `Deno.readDir` call',
+    ],
+    op_read_link_async: [
+      'read a symlink',
+      'awaiting the result of a `Deno.readLink` call',
+    ],
+    op_realpath_async: [
+      'resolve a path',
+      'awaiting the result of a `Deno.realpath` call',
+    ],
+    op_remove_async: [
+      'remove a file or directory',
+      'awaiting the result of a `Deno.remove` call',
+    ],
+    op_rename_async: [
+      'rename a file or directory',
+      'awaiting the result of a `Deno.rename` call',
+    ],
+    op_run_status: [
+      'get the status of a subprocess',
+      'awaiting the result of a `Deno.Process#status` call',
+    ],
+    op_seek_async: [
+      'seek in a file',
+      'awaiting the result of a `Deno.File#seek` call',
+    ],
+    op_signal_poll: [
+      'get the next signal',
+      'un-registering a OS signal handler',
+    ],
+    op_sleep: [
+      'sleep for a duration',
+      'cancelling a `setTimeout` or `setInterval` call',
+    ],
+    op_stat_async: [
+      'get file metadata',
+      'awaiting the result of a `Deno.stat` call',
+    ],
+    op_symlink_async: [
+      'create a symlink',
+      'awaiting the result of a `Deno.symlink` call',
+    ],
+    op_tls_accept: ['accept a TLS connection', 'closing a `Deno.TlsListener`'],
+    op_tls_connect: [
+      'connect to a TLS server',
+      'awaiting a `Deno.connectTls` call',
+    ],
+    op_tls_handshake: [
+      'perform a TLS handshake',
+      'awaiting a `Deno.TlsConn#handshake` call',
+    ],
+    op_tls_start: ['start a TLS connection', 'awaiting a `Deno.startTls` call'],
+    op_truncate_async: [
+      'truncate a file',
+      'awaiting the result of a `Deno.truncate` call',
+    ],
+    op_utime_async: [
+      'change file timestamps',
+      'awaiting the result of a `Deno.utime` call',
+    ],
+    op_webgpu_buffer_get_map_async: [
+      'map a WebGPU buffer',
+      'awaiting the result of a `GPUBuffer#mapAsync` call',
+    ],
+    op_webgpu_request_adapter: [
+      'request a WebGPU adapter',
+      'awaiting the result of a `navigator.gpu.requestAdapter` call',
+    ],
+    op_webgpu_request_device: [
+      'request a WebGPU device',
+      'awaiting the result of a `GPUAdapter#requestDevice` call',
+    ],
+    op_worker_recv_message: [
+      'receive a message from a web worker',
+      'terminating a `Worker`',
+    ],
+    op_ws_close: [
+      'close a WebSocket',
+      'awaiting until the `close` event is emitted on a `WebSocket`, or the `WebSocketStream#closed` promise resolves',
+    ],
+    op_ws_create: [
+      'create a WebSocket',
+      'awaiting until the `open` event is emitted on a `WebSocket`, or the result of a `WebSocketStream#connection` promise',
+    ],
+    op_ws_next_event: [
+      'receive the next message on a WebSocket',
+      'closing a `WebSocket` or `WebSocketStream`',
+    ],
+    op_ws_send: [
+      'send a message on a WebSocket',
+      'closing a `WebSocket` or `WebSocketStream`',
+    ],
   };
 
   // Wrap test function in additional assertion that makes sure
@@ -167,21 +350,23 @@
 
       const details = [];
       for (const key in post.ops) {
-        const preOp = pre.ops[key] ??
-          { opsDispatchedAsync: 0, opsCompletedAsync: 0 };
+        const preOp = pre.ops[key] ?? {
+          opsDispatchedAsync: 0,
+          opsCompletedAsync: 0,
+        };
         const postOp = post.ops[key];
-        const dispatchedDiff = postOp.opsDispatchedAsync -
-          preOp.opsDispatchedAsync;
-        const completedDiff = postOp.opsCompletedAsync -
-          preOp.opsCompletedAsync;
+        const dispatchedDiff =
+          postOp.opsDispatchedAsync - preOp.opsDispatchedAsync;
+        const completedDiff =
+          postOp.opsCompletedAsync - preOp.opsCompletedAsync;
 
         if (dispatchedDiff > completedDiff) {
           const [name, hint] = OP_DETAILS[key] || [key, null];
           const count = dispatchedDiff - completedDiff;
           let message = `${count} async operation${
-            count === 1 ? "" : "s"
+            count === 1 ? '' : 's'
           } to ${name} ${
-            count === 1 ? "was" : "were"
+            count === 1 ? 'was' : 'were'
           } started in this test, but never completed.`;
           if (hint) {
             message += ` This is often caused by not ${hint}.`;
@@ -193,11 +378,11 @@
             ArrayPrototypePush(traces, stack);
           }
           if (traces.length === 1) {
-            message += " The operation was started here:\n";
+            message += ' The operation was started here:\n';
             message += traces[0];
           } else if (traces.length > 1) {
-            message += " The operations were started here:\n";
-            message += ArrayPrototypeJoin(traces, "\n\n");
+            message += ' The operations were started here:\n';
+            message += ArrayPrototypeJoin(traces, '\n\n');
           }
           ArrayPrototypePush(details, message);
         } else if (dispatchedDiff < completedDiff) {
@@ -205,169 +390,168 @@
           const count = completedDiff - dispatchedDiff;
           ArrayPrototypePush(
             details,
-            `${count} async operation${count === 1 ? "" : "s"} to ${name} ${
-              count === 1 ? "was" : "were"
+            `${count} async operation${count === 1 ? '' : 's'} to ${name} ${
+              count === 1 ? 'was' : 'were'
             } started before this test, but ${
-              count === 1 ? "was" : "were"
+              count === 1 ? 'was' : 'were'
             } completed during the test. Async operations should not complete in a test if they were not started in that test.
-            ${hint ? `This is often caused by not ${hint}.` : ""}`,
+            ${hint ? `This is often caused by not ${hint}.` : ''}`
           );
         }
       }
 
       let msg = `Test case is leaking async ops.
 
-- ${ArrayPrototypeJoin(details, "\n - ")}`;
+ - ${ArrayPrototypeJoin(details, '\n - ')}`;
 
       if (!core.isOpCallTracingEnabled()) {
-        msg +=
-          `\n\nTo get more details where ops were leaked, run again with --trace-ops flag.`;
+        msg += `\n\nTo get more details where ops were leaked, run again with --trace-ops flag.`;
+      } else {
+        msg += '\n';
       }
 
-      throw msg;
+      throw assert(false, msg);
     };
   }
 
   function prettyResourceNames(name) {
     switch (name) {
-      case "fsFile":
-        return ["A file", "opened", "closed"];
-      case "fetchRequest":
-        return ["A fetch request", "started", "finished"];
-      case "fetchRequestBody":
-        return ["A fetch request body", "created", "closed"];
-      case "fetchResponseBody":
-        return ["A fetch response body", "created", "consumed"];
-      case "httpClient":
-        return ["An HTTP client", "created", "closed"];
-      case "dynamicLibrary":
-        return ["A dynamic library", "loaded", "unloaded"];
-      case "httpConn":
-        return ["An inbound HTTP connection", "accepted", "closed"];
-      case "httpStream":
-        return ["An inbound HTTP request", "accepted", "closed"];
-      case "tcpStream":
-        return ["A TCP connection", "opened/accepted", "closed"];
-      case "unixStream":
-        return ["A Unix connection", "opened/accepted", "closed"];
-      case "tlsStream":
-        return ["A TLS connection", "opened/accepted", "closed"];
-      case "tlsListener":
-        return ["A TLS listener", "opened", "closed"];
-      case "unixListener":
-        return ["A Unix listener", "opened", "closed"];
-      case "unixDatagram":
-        return ["A Unix datagram", "opened", "closed"];
-      case "tcpListener":
-        return ["A TCP listener", "opened", "closed"];
-      case "udpSocket":
-        return ["A UDP socket", "opened", "closed"];
-      case "timer":
-        return ["A timer", "started", "fired/cleared"];
-      case "textDecoder":
-        return ["A text decoder", "created", "finsihed"];
-      case "messagePort":
-        return ["A message port", "created", "closed"];
-      case "webSocketStream":
-        return ["A WebSocket", "opened", "closed"];
-      case "fsEvents":
-        return ["A file system watcher", "created", "closed"];
-      case "childStdin":
-        return ["A child process stdin", "opened", "closed"];
-      case "childStdout":
-        return ["A child process stdout", "opened", "closed"];
-      case "childStderr":
-        return ["A child process stderr", "opened", "closed"];
-      case "child":
-        return ["A child process", "started", "closed"];
-      case "signal":
-        return ["A signal listener", "created", "fired/cleared"];
-      case "stdin":
-        return ["The stdin pipe", "opened", "closed"];
-      case "stdout":
-        return ["The stdout pipe", "opened", "closed"];
-      case "stderr":
-        return ["The stderr pipe", "opened", "closed"];
-      case "compression":
-        return ["A CompressionStream", "created", "closed"];
+      case 'fsFile':
+        return ['A file', 'opened', 'closed'];
+      case 'fetchRequest':
+        return ['A fetch request', 'started', 'finished'];
+      case 'fetchRequestBody':
+        return ['A fetch request body', 'created', 'closed'];
+      case 'fetchResponseBody':
+        return ['A fetch response body', 'created', 'consumed'];
+      case 'httpClient':
+        return ['An HTTP client', 'created', 'closed'];
+      case 'dynamicLibrary':
+        return ['A dynamic library', 'loaded', 'unloaded'];
+      case 'httpConn':
+        return ['An inbound HTTP connection', 'accepted', 'closed'];
+      case 'httpStream':
+        return ['An inbound HTTP request', 'accepted', 'closed'];
+      case 'tcpStream':
+        return ['A TCP connection', 'opened/accepted', 'closed'];
+      case 'unixStream':
+        return ['A Unix connection', 'opened/accepted', 'closed'];
+      case 'tlsStream':
+        return ['A TLS connection', 'opened/accepted', 'closed'];
+      case 'tlsListener':
+        return ['A TLS listener', 'opened', 'closed'];
+      case 'unixListener':
+        return ['A Unix listener', 'opened', 'closed'];
+      case 'unixDatagram':
+        return ['A Unix datagram', 'opened', 'closed'];
+      case 'tcpListener':
+        return ['A TCP listener', 'opened', 'closed'];
+      case 'udpSocket':
+        return ['A UDP socket', 'opened', 'closed'];
+      case 'timer':
+        return ['A timer', 'started', 'fired/cleared'];
+      case 'textDecoder':
+        return ['A text decoder', 'created', 'finsihed'];
+      case 'messagePort':
+        return ['A message port', 'created', 'closed'];
+      case 'webSocketStream':
+        return ['A WebSocket', 'opened', 'closed'];
+      case 'fsEvents':
+        return ['A file system watcher', 'created', 'closed'];
+      case 'childStdin':
+        return ['A child process stdin', 'opened', 'closed'];
+      case 'childStdout':
+        return ['A child process stdout', 'opened', 'closed'];
+      case 'childStderr':
+        return ['A child process stderr', 'opened', 'closed'];
+      case 'child':
+        return ['A child process', 'started', 'closed'];
+      case 'signal':
+        return ['A signal listener', 'created', 'fired/cleared'];
+      case 'stdin':
+        return ['The stdin pipe', 'opened', 'closed'];
+      case 'stdout':
+        return ['The stdout pipe', 'opened', 'closed'];
+      case 'stderr':
+        return ['The stderr pipe', 'opened', 'closed'];
+      case 'compression':
+        return ['A CompressionStream', 'created', 'closed'];
       default:
-        return [`A "${name}" resource`, "created", "cleaned up"];
+        return [`A "${name}" resource`, 'created', 'cleaned up'];
     }
   }
 
   function resourceCloseHint(name) {
     switch (name) {
-      case "fsFile":
-        return "Close the file handle by calling `file.close()`.";
-      case "fetchRequest":
-        return "Await the promise returned from `fetch()` or abort the fetch with an abort signal.";
-      case "fetchRequestBody":
-        return "Terminate the request body `ReadableStream` by closing or erroring it.";
-      case "fetchResponseBody":
-        return "Consume or close the response body `ReadableStream`, e.g `await resp.text()` or `await resp.body.cancel()`.";
-      case "httpClient":
-        return "Close the HTTP client by calling `httpClient.close()`.";
-      case "dynamicLibrary":
-        return "Unload the dynamic library by calling `dynamicLibrary.close()`.";
-      case "httpConn":
-        return "Close the inbound HTTP connection by calling `httpConn.close()`.";
-      case "httpStream":
-        return "Close the inbound HTTP request by responding with `e.respondWith().` or closing the HTTP connection.";
-      case "tcpStream":
-        return "Close the TCP connection by calling `tcpConn.close()`.";
-      case "unixStream":
-        return "Close the Unix socket connection by calling `unixConn.close()`.";
-      case "tlsStream":
-        return "Close the TLS connection by calling `tlsConn.close()`.";
-      case "tlsListener":
-        return "Close the TLS listener by calling `tlsListener.close()`.";
-      case "unixListener":
-        return "Close the Unix socket listener by calling `unixListener.close()`.";
-      case "unixDatagram":
-        return "Close the Unix datagram socket by calling `unixDatagram.close()`.";
-      case "tcpListener":
-        return "Close the TCP listener by calling `tcpListener.close()`.";
-      case "udpSocket":
-        return "Close the UDP socket by calling `udpSocket.close()`.";
-      case "timer":
-        return "Clear the timer by calling `clearInterval` or `clearTimeout`.";
-      case "textDecoder":
+      case 'fsFile':
+        return 'Close the file handle by calling `file.close()`.';
+      case 'fetchRequest':
+        return 'Await the promise returned from `fetch()` or abort the fetch with an abort signal.';
+      case 'fetchRequestBody':
+        return 'Terminate the request body `ReadableStream` by closing or erroring it.';
+      case 'fetchResponseBody':
+        return 'Consume or close the response body `ReadableStream`, e.g `await resp.text()` or `await resp.body.cancel()`.';
+      case 'httpClient':
+        return 'Close the HTTP client by calling `httpClient.close()`.';
+      case 'dynamicLibrary':
+        return 'Unload the dynamic library by calling `dynamicLibrary.close()`.';
+      case 'httpConn':
+        return 'Close the inbound HTTP connection by calling `httpConn.close()`.';
+      case 'httpStream':
+        return 'Close the inbound HTTP request by responding with `e.respondWith().` or closing the HTTP connection.';
+      case 'tcpStream':
+        return 'Close the TCP connection by calling `tcpConn.close()`.';
+      case 'unixStream':
+        return 'Close the Unix socket connection by calling `unixConn.close()`.';
+      case 'tlsStream':
+        return 'Close the TLS connection by calling `tlsConn.close()`.';
+      case 'tlsListener':
+        return 'Close the TLS listener by calling `tlsListener.close()`.';
+      case 'unixListener':
+        return 'Close the Unix socket listener by calling `unixListener.close()`.';
+      case 'unixDatagram':
+        return 'Close the Unix datagram socket by calling `unixDatagram.close()`.';
+      case 'tcpListener':
+        return 'Close the TCP listener by calling `tcpListener.close()`.';
+      case 'udpSocket':
+        return 'Close the UDP socket by calling `udpSocket.close()`.';
+      case 'timer':
+        return 'Clear the timer by calling `clearInterval` or `clearTimeout`.';
+      case 'textDecoder':
         return "Close the text decoder by calling `textDecoder.decode('')` or `await textDecoderStream.readable.cancel()`.";
-      case "messagePort":
-        return "Close the message port by calling `messagePort.close()`.";
-      case "webSocketStream":
-        return "Close the WebSocket by calling `webSocket.close()`.";
-      case "fsEvents":
-        return "Close the file system watcher by calling `watcher.close()`.";
-      case "childStdin":
-        return "Close the child process stdin by calling `proc.stdin.close()`.";
-      case "childStdout":
-        return "Close the child process stdout by calling `proc.stdout.close()`.";
-      case "childStderr":
-        return "Close the child process stderr by calling `proc.stderr.close()`.";
-      case "child":
-        return "Close the child process by calling `proc.kill()` or `proc.close()`.";
-      case "signal":
-        return "Clear the signal listener by calling `Deno.removeSignalListener`.";
-      case "stdin":
-        return "Close the stdin pipe by calling `Deno.stdin.close()`.";
-      case "stdout":
-        return "Close the stdout pipe by calling `Deno.stdout.close()`.";
-      case "stderr":
-        return "Close the stderr pipe by calling `Deno.stderr.close()`.";
-      case "compression":
-        return "Close the compression stream by calling `await stream.writable.close()`.";
+      case 'messagePort':
+        return 'Close the message port by calling `messagePort.close()`.';
+      case 'webSocketStream':
+        return 'Close the WebSocket by calling `webSocket.close()`.';
+      case 'fsEvents':
+        return 'Close the file system watcher by calling `watcher.close()`.';
+      case 'childStdin':
+        return 'Close the child process stdin by calling `proc.stdin.close()`.';
+      case 'childStdout':
+        return 'Close the child process stdout by calling `proc.stdout.close()`.';
+      case 'childStderr':
+        return 'Close the child process stderr by calling `proc.stderr.close()`.';
+      case 'child':
+        return 'Close the child process by calling `proc.kill()` or `proc.close()`.';
+      case 'signal':
+        return 'Clear the signal listener by calling `Deno.removeSignalListener`.';
+      case 'stdin':
+        return 'Close the stdin pipe by calling `Deno.stdin.close()`.';
+      case 'stdout':
+        return 'Close the stdout pipe by calling `Deno.stdout.close()`.';
+      case 'stderr':
+        return 'Close the stderr pipe by calling `Deno.stderr.close()`.';
+      case 'compression':
+        return 'Close the compression stream by calling `await stream.writable.close()`.';
       default:
-        return "Close the resource before the end of the test.";
+        return 'Close the resource before the end of the test.';
     }
   }
 
   // Wrap test function in additional assertion that makes sure
   // the test case does not "leak" resources - ie. resource table after
   // the test has exactly the same contents as before the test.
-  function assertResources(
-    fn,
-  ) {
+  function assertResources(fn) {
     /** @param step {TestStep} */
     return async function resourceSanitizer(step) {
       const pre = core.resources();
@@ -393,22 +577,20 @@
         if (preResource === undefined) {
           const [name, action1, action2] = prettyResourceNames(postResource);
           const hint = resourceCloseHint(postResource);
-          const detail =
-            `${name} (rid ${resource}) was ${action1} during the test, but not ${action2} during the test. ${hint}`;
+          const detail = `${name} (rid ${resource}) was ${action1} during the test, but not ${action2} during the test. ${hint}`;
           details.push(detail);
         } else {
           const [name, action1, action2] = prettyResourceNames(preResource);
-          const detail =
-            `${name} (rid ${resource}) was ${action1} before the test started, but was ${action2} during the test. Do not close resources in a test that were not created during that test.`;
+          const detail = `${name} (rid ${resource}) was ${action1} before the test started, but was ${action2} during the test. Do not close resources in a test that were not created during that test.`;
           details.push(detail);
         }
       }
 
       const message = `Test case is leaking ${details.length} resource${
-        details.length === 1 ? "" : "s"
+        details.length === 1 ? '' : 's'
       }:
 
- - ${details.join("\n - ")}
+ - ${details.join('\n - ')}
 `;
       assert(details.length === 0, message);
     };
@@ -422,8 +604,8 @@
         assert(
           false,
           `${
-            isTest ? "Test case" : "Bench"
-          } attempted to exit with exit code: ${exitCode}`,
+            isTest ? 'Test case' : 'Bench'
+          } attempted to exit with exit code: ${exitCode}`
         );
       });
 
@@ -452,22 +634,22 @@
         const runningSteps = getPotentialConflictingRunningSteps();
         const runningStepsWithSanitizers = ArrayPrototypeFilter(
           runningSteps,
-          (t) => t.usesSanitizer,
+          (t) => t.usesSanitizer
         );
 
         if (runningStepsWithSanitizers.length > 0) {
           throw new Error(
-            "Cannot start test step while another test step with sanitizers is running.\n" +
+            'Cannot start test step while another test step with sanitizers is running.\n' +
               runningStepsWithSanitizers
                 .map((s) => ` * ${s.getFullName()}`)
-                .join("\n"),
+                .join('\n')
           );
         }
 
         if (step.usesSanitizer && runningSteps.length > 0) {
           throw new Error(
-            "Cannot start test step with sanitizers while another test step is running.\n" +
-              runningSteps.map((s) => ` * ${s.getFullName()}`).join("\n"),
+            'Cannot start test step with sanitizers while another test step is running.\n' +
+              runningSteps.map((s) => ` * ${s.getFullName()}`).join('\n')
           );
         }
 
@@ -495,8 +677,8 @@
         // check for any running steps
         if (step.hasRunningChildren) {
           throw new Error(
-            "There were still test steps running after the current scope finished execution. " +
-              "Ensure all steps are awaited (ex. `await t.step(...)`).",
+            'There were still test steps running after the current scope finished execution. ' +
+              'Ensure all steps are awaited (ex. `await t.step(...)`).'
           );
         }
 
@@ -504,8 +686,8 @@
         for (const ancestor of step.ancestors()) {
           if (ancestor.finalized) {
             throw new Error(
-              "Parent scope completed before test step finished execution. " +
-                "Ensure all steps are awaited (ex. `await t.step(...)`).",
+              'Parent scope completed before test step finished execution. ' +
+                'Ensure all steps are awaited (ex. `await t.step(...)`).'
             );
           }
         }
@@ -515,13 +697,13 @@
 
   function pledgePermissions(permissions) {
     return core.opSync(
-      "op_pledge_test_permissions",
-      serializePermissions(permissions),
+      'op_pledge_test_permissions',
+      serializePermissions(permissions)
     );
   }
 
   function restorePermissions(token) {
-    core.opSync("op_restore_test_permissions", token);
+    core.opSync('op_restore_test_permissions', token);
   }
 
   function withPermissions(fn, permissions) {
@@ -555,11 +737,7 @@
   const benchDescs = [];
 
   // Main test function provided by Deno.
-  function test(
-    nameOrFnOrOptions,
-    optionsOrFn,
-    maybeFn,
-  ) {
+  function test(nameOrFnOrOptions, optionsOrFn, maybeFn) {
     let testDef;
     const defaults = {
       ignore: false,
@@ -570,24 +748,24 @@
       permissions: null,
     };
 
-    if (typeof nameOrFnOrOptions === "string") {
+    if (typeof nameOrFnOrOptions === 'string') {
       if (!nameOrFnOrOptions) {
         throw new TypeError("The test name can't be empty");
       }
-      if (typeof optionsOrFn === "function") {
+      if (typeof optionsOrFn === 'function') {
         testDef = { fn: optionsOrFn, name: nameOrFnOrOptions, ...defaults };
       } else {
-        if (!maybeFn || typeof maybeFn !== "function") {
-          throw new TypeError("Missing test function");
+        if (!maybeFn || typeof maybeFn !== 'function') {
+          throw new TypeError('Missing test function');
         }
         if (optionsOrFn.fn != undefined) {
           throw new TypeError(
-            "Unexpected 'fn' field in options, test function is already provided as the third argument.",
+            "Unexpected 'fn' field in options, test function is already provided as the third argument."
           );
         }
         if (optionsOrFn.name != undefined) {
           throw new TypeError(
-            "Unexpected 'name' field in options, test name is already provided as the first argument.",
+            "Unexpected 'name' field in options, test name is already provided as the first argument."
           );
         }
         testDef = {
@@ -597,15 +775,15 @@
           name: nameOrFnOrOptions,
         };
       }
-    } else if (typeof nameOrFnOrOptions === "function") {
+    } else if (typeof nameOrFnOrOptions === 'function') {
       if (!nameOrFnOrOptions.name) {
-        throw new TypeError("The test function must have a name");
+        throw new TypeError('The test function must have a name');
       }
       if (optionsOrFn != undefined) {
-        throw new TypeError("Unexpected second argument to Deno.test()");
+        throw new TypeError('Unexpected second argument to Deno.test()');
       }
       if (maybeFn != undefined) {
-        throw new TypeError("Unexpected third argument to Deno.test()");
+        throw new TypeError('Unexpected third argument to Deno.test()');
       }
       testDef = {
         ...defaults,
@@ -615,20 +793,21 @@
     } else {
       let fn;
       let name;
-      if (typeof optionsOrFn === "function") {
+      if (typeof optionsOrFn === 'function') {
         fn = optionsOrFn;
         if (nameOrFnOrOptions.fn != undefined) {
           throw new TypeError(
-            "Unexpected 'fn' field in options, test function is already provided as the second argument.",
+            "Unexpected 'fn' field in options, test function is already provided as the second argument."
           );
         }
         name = nameOrFnOrOptions.name ?? fn.name;
       } else {
         if (
-          !nameOrFnOrOptions.fn || typeof nameOrFnOrOptions.fn !== "function"
+          !nameOrFnOrOptions.fn ||
+          typeof nameOrFnOrOptions.fn !== 'function'
         ) {
           throw new TypeError(
-            "Expected 'fn' field in the first argument to be a test function.",
+            "Expected 'fn' field in the first argument to be a test function."
           );
         }
         fn = nameOrFnOrOptions.fn;
@@ -643,10 +822,7 @@
     testDef.fn = wrapTestFnWithSanitizers(testDef.fn, testDef);
 
     if (testDef.permissions) {
-      testDef.fn = withPermissions(
-        testDef.fn,
-        testDef.permissions,
-      );
+      testDef.fn = withPermissions(testDef.fn, testDef.permissions);
     }
 
     const jsError = Deno.core.destructureError(new Error());
@@ -663,12 +839,8 @@
   }
 
   // Main bench function provided by Deno.
-  function bench(
-    nameOrFnOrOptions,
-    optionsOrFn,
-    maybeFn,
-  ) {
-    core.opSync("op_bench_check_unstable");
+  function bench(nameOrFnOrOptions, optionsOrFn, maybeFn) {
+    core.opSync('op_bench_check_unstable');
     let benchDesc;
     const defaults = {
       ignore: false,
@@ -678,24 +850,24 @@
       permissions: null,
     };
 
-    if (typeof nameOrFnOrOptions === "string") {
+    if (typeof nameOrFnOrOptions === 'string') {
       if (!nameOrFnOrOptions) {
         throw new TypeError("The bench name can't be empty");
       }
-      if (typeof optionsOrFn === "function") {
+      if (typeof optionsOrFn === 'function') {
         benchDesc = { fn: optionsOrFn, name: nameOrFnOrOptions, ...defaults };
       } else {
-        if (!maybeFn || typeof maybeFn !== "function") {
-          throw new TypeError("Missing bench function");
+        if (!maybeFn || typeof maybeFn !== 'function') {
+          throw new TypeError('Missing bench function');
         }
         if (optionsOrFn.fn != undefined) {
           throw new TypeError(
-            "Unexpected 'fn' field in options, bench function is already provided as the third argument.",
+            "Unexpected 'fn' field in options, bench function is already provided as the third argument."
           );
         }
         if (optionsOrFn.name != undefined) {
           throw new TypeError(
-            "Unexpected 'name' field in options, bench name is already provided as the first argument.",
+            "Unexpected 'name' field in options, bench name is already provided as the first argument."
           );
         }
         benchDesc = {
@@ -705,15 +877,15 @@
           name: nameOrFnOrOptions,
         };
       }
-    } else if (typeof nameOrFnOrOptions === "function") {
+    } else if (typeof nameOrFnOrOptions === 'function') {
       if (!nameOrFnOrOptions.name) {
-        throw new TypeError("The bench function must have a name");
+        throw new TypeError('The bench function must have a name');
       }
       if (optionsOrFn != undefined) {
-        throw new TypeError("Unexpected second argument to Deno.bench()");
+        throw new TypeError('Unexpected second argument to Deno.bench()');
       }
       if (maybeFn != undefined) {
-        throw new TypeError("Unexpected third argument to Deno.bench()");
+        throw new TypeError('Unexpected third argument to Deno.bench()');
       }
       benchDesc = {
         ...defaults,
@@ -723,20 +895,21 @@
     } else {
       let fn;
       let name;
-      if (typeof optionsOrFn === "function") {
+      if (typeof optionsOrFn === 'function') {
         fn = optionsOrFn;
         if (nameOrFnOrOptions.fn != undefined) {
           throw new TypeError(
-            "Unexpected 'fn' field in options, bench function is already provided as the second argument.",
+            "Unexpected 'fn' field in options, bench function is already provided as the second argument."
           );
         }
         name = nameOrFnOrOptions.name ?? fn.name;
       } else {
         if (
-          !nameOrFnOrOptions.fn || typeof nameOrFnOrOptions.fn !== "function"
+          !nameOrFnOrOptions.fn ||
+          typeof nameOrFnOrOptions.fn !== 'function'
         ) {
           throw new TypeError(
-            "Expected 'fn' field in the first argument to be a bench function.",
+            "Expected 'fn' field in the first argument to be a bench function."
           );
         }
         fn = nameOrFnOrOptions.fn;
@@ -752,7 +925,7 @@
     const AsyncFunction = (async () => {}).constructor;
     benchDesc.async = AsyncFunction === benchDesc.fn.constructor;
 
-    const { id, filteredOut } = core.opSync("op_register_bench", benchDesc);
+    const { id, filteredOut } = core.opSync('op_register_bench', benchDesc);
     benchDesc.id = id;
     benchDesc.filteredOut = filteredOut;
 
@@ -769,12 +942,13 @@
     }
 
     const regex =
-      typeof filter === "string" && StringPrototypeStartsWith(filter, "/") &&
-        StringPrototypeEndsWith(filter, "/")
+      typeof filter === 'string' &&
+      StringPrototypeStartsWith(filter, '/') &&
+      StringPrototypeEndsWith(filter, '/')
         ? new RegExp(StringPrototypeSlice(filter, 1, filter.length - 1))
         : undefined;
 
-    const filterIsObject = filter != null && typeof filter === "object";
+    const filterIsObject = filter != null && typeof filter === 'object';
 
     return (def) => {
       if (regex) {
@@ -795,7 +969,7 @@
 
   async function runTest(test, description) {
     if (test.ignore) {
-      return "ignored";
+      return 'ignored';
     }
 
     const step = new TestStep({
@@ -811,16 +985,18 @@
     try {
       await test.fn(step);
       const failCount = step.failedChildStepsCount();
-      return failCount === 0 ? "ok" : {
-        "failed": core.destructureError(
-          new Error(
-            `${failCount} test step${failCount === 1 ? "" : "s"} failed.`,
-          ),
-        ),
-      };
+      return failCount === 0
+        ? 'ok'
+        : {
+            failed: core.destructureError(
+              new Error(
+                `${failCount} test step${failCount === 1 ? '' : 's'} failed.`
+              )
+            ),
+          };
     } catch (error) {
       return {
-        "failed": core.destructureError(error),
+        failed: core.destructureError(error),
       };
     } finally {
       step.finalized = true;
@@ -847,7 +1023,7 @@
       p99: all[MathCeil(n * (99 / 100)) - 1],
       p995: all[MathCeil(n * (99.5 / 100)) - 1],
       p999: all[MathCeil(n * (99.9 / 100)) - 1],
-      avg: !highPrecision ? (avg / n) : MathCeil(avg / n),
+      avg: !highPrecision ? avg / n : MathCeil(avg / n),
     };
   }
 
@@ -973,10 +1149,7 @@
 
       if (desc.sanitizeExit) {
         setExitHandler((exitCode) => {
-          assert(
-            false,
-            `Bench attempted to exit with exit code: ${exitCode}`,
-          );
+          assert(false, `Bench attempted to exit with exit code: ${exitCode}`);
         });
       }
 
@@ -996,56 +1169,53 @@
 
   function getTestOrigin() {
     if (origin == null) {
-      origin = core.opSync("op_get_test_origin");
+      origin = core.opSync('op_get_test_origin');
     }
     return origin;
   }
 
   function getBenchOrigin() {
     if (origin == null) {
-      origin = core.opSync("op_get_bench_origin");
+      origin = core.opSync('op_get_bench_origin');
     }
     return origin;
   }
 
   function reportTestPlan(plan) {
-    core.opSync("op_dispatch_test_event", {
+    core.opSync('op_dispatch_test_event', {
       plan,
     });
   }
 
   function reportTestWait(test) {
-    core.opSync("op_dispatch_test_event", {
+    core.opSync('op_dispatch_test_event', {
       wait: test,
     });
   }
 
   function reportTestResult(test, result, elapsed) {
-    core.opSync("op_dispatch_test_event", {
+    core.opSync('op_dispatch_test_event', {
       result: [test, result, elapsed],
     });
   }
 
   function reportTestStepWait(testDescription) {
-    core.opSync("op_dispatch_test_event", {
+    core.opSync('op_dispatch_test_event', {
       stepWait: testDescription,
     });
   }
 
   function reportTestStepResult(testDescription, result, elapsed) {
-    core.opSync("op_dispatch_test_event", {
+    core.opSync('op_dispatch_test_event', {
       stepResult: [testDescription, result, elapsed],
     });
   }
 
   function benchNow() {
-    return core.opSync("op_bench_now");
+    return core.opSync('op_bench_now');
   }
 
-  async function runTests({
-    filter = null,
-    shuffle = null,
-  } = {}) {
+  async function runTests({ filter = null, shuffle = null } = {}) {
     core.setMacrotaskCallback(handleOpSanitizerDelayMacrotask);
 
     const origin = getTestOrigin();
@@ -1053,7 +1223,7 @@
     const only = ArrayPrototypeFilter(tests, (test) => test.only);
     const filtered = ArrayPrototypeFilter(
       only.length > 0 ? only : tests,
-      createTestFilter(filter),
+      createTestFilter(filter)
     );
 
     reportTestPlan({
@@ -1071,9 +1241,9 @@
         const c = 12345;
 
         return function (max) {
-          return state = ((a * state + c) % m) % max;
+          return (state = ((a * state + c) % m) % max);
         };
-      }(shuffle));
+      })(shuffle);
 
       for (let i = filtered.length - 1; i > 0; i--) {
         const j = nextInt(i);
@@ -1105,13 +1275,13 @@
     const originalConsole = globalThis.console;
 
     globalThis.console = new Console((s) => {
-      core.opSync("op_dispatch_bench_event", { output: s });
+      core.opSync('op_dispatch_bench_event', { output: s });
     });
 
     const only = ArrayPrototypeFilter(benchDescs, (bench) => bench.only);
     const filtered = ArrayPrototypeFilter(
       only.length > 0 ? only : benchDescs,
-      (desc) => !desc.filteredOut && !desc.ignore,
+      (desc) => !desc.filteredOut && !desc.ignore
     );
 
     let groups = new Set();
@@ -1126,10 +1296,10 @@
     groups = ArrayFrom(groups);
     ArrayPrototypeSort(
       filtered,
-      (a, b) => groups.indexOf(a.group) - groups.indexOf(b.group),
+      (a, b) => groups.indexOf(a.group) - groups.indexOf(b.group)
     );
 
-    core.opSync("op_dispatch_bench_event", {
+    core.opSync('op_dispatch_bench_event', {
       plan: {
         origin,
         total: filtered.length,
@@ -1140,8 +1310,8 @@
 
     for (const desc of filtered) {
       desc.baseline = !!desc.baseline;
-      core.opSync("op_dispatch_bench_event", { wait: desc.id });
-      core.opSync("op_dispatch_bench_event", {
+      core.opSync('op_dispatch_bench_event', { wait: desc.id });
+      core.opSync('op_dispatch_bench_event', {
         result: [desc.id, await runBench(desc)],
       });
     }
@@ -1178,7 +1348,7 @@
     finalized = false;
     elapsed = 0;
     /** @type "ok" | "ignored" | "pending" | "failed" */
-    status = "pending";
+    status = 'pending';
     error = undefined;
     /** @type {TestStep[]} */
     children = [];
@@ -1213,9 +1383,11 @@
     }
 
     get usesSanitizer() {
-      return this.#params.sanitizeResources ||
+      return (
+        this.#params.sanitizeResources ||
         this.#params.sanitizeOps ||
-        this.#params.sanitizeExit;
+        this.#params.sanitizeExit
+      );
     }
 
     /** If a test validation error already occurred then don't bother checking
@@ -1229,7 +1401,7 @@
       return ArrayPrototypeSome(
         this.children,
         /** @param step {TestStep} */
-        (step) => step.status === "pending",
+        (step) => step.status === 'pending'
       );
     }
 
@@ -1237,15 +1409,17 @@
       return ArrayPrototypeFilter(
         this.children,
         /** @param step {TestStep} */
-        (step) => step.status === "failed",
+        (step) => step.status === 'failed'
       ).length;
     }
 
     canStreamReporting() {
       // there should only ever be one sub step running when running with
       // sanitizers, so we can use this to tell if we can stream reporting
-      return this.selfAndAllAncestorsUseSanitizer() &&
-        this.children.every((c) => c.usesSanitizer || c.finalized);
+      return (
+        this.selfAndAllAncestorsUseSanitizer() &&
+        this.children.every((c) => c.usesSanitizer || c.finalized)
+      );
     }
 
     selfAndAllAncestorsUseSanitizer() {
@@ -1302,7 +1476,7 @@
       reportTestStepResult(
         this.#getTestStepDescription(),
         this.#getStepResult(),
-        this.elapsed,
+        this.elapsed
       );
 
       this.#reportedResult = true;
@@ -1310,17 +1484,17 @@
 
     #getStepResult() {
       switch (this.status) {
-        case "ok":
-          return "ok";
-        case "ignored":
-          return "ignored";
-        case "pending":
+        case 'ok':
+          return 'ok';
+        case 'ignored':
+          return 'ignored';
+        case 'pending':
           return {
-            "pending": this.error && core.destructureError(this.error),
+            pending: this.error && core.destructureError(this.error),
           };
-        case "failed":
+        case 'failed':
           return {
-            "failed": this.error && core.destructureError(this.error),
+            failed: this.error && core.destructureError(this.error),
           };
         default:
           throw new Error(`Unhandled status: ${this.status}`);
@@ -1347,7 +1521,7 @@
   /** @param parentStep {TestStep} */
   function createTestContext(parentStep) {
     return {
-      [SymbolToStringTag]: "TestContext",
+      [SymbolToStringTag]: 'TestContext',
       /**
        * The current test name.
        */
@@ -1367,8 +1541,8 @@
       async step(nameOrTestDefinition, fn) {
         if (parentStep.finalized) {
           throw new Error(
-            "Cannot run test step after parent scope has finished execution. " +
-              "Ensure any `.step(...)` calls are executed before their parent scope completes execution.",
+            'Cannot run test step after parent scope has finished execution. ' +
+              'Ensure any `.step(...)` calls are executed before their parent scope completes execution.'
           );
         }
 
@@ -1380,15 +1554,15 @@
           rootTestDescription: parentStep.rootTestDescription,
           sanitizeOps: getOrDefault(
             definition.sanitizeOps,
-            parentStep.sanitizerOptions.sanitizeOps,
+            parentStep.sanitizerOptions.sanitizeOps
           ),
           sanitizeResources: getOrDefault(
             definition.sanitizeResources,
-            parentStep.sanitizerOptions.sanitizeResources,
+            parentStep.sanitizerOptions.sanitizeResources
           ),
           sanitizeExit: getOrDefault(
             definition.sanitizeExit,
-            parentStep.sanitizerOptions.sanitizeExit,
+            parentStep.sanitizerOptions.sanitizeExit
           ),
         });
 
@@ -1396,7 +1570,7 @@
 
         try {
           if (definition.ignore) {
-            subStep.status = "ignored";
+            subStep.status = 'ignored';
             subStep.finalized = true;
             if (subStep.canStreamReporting()) {
               subStep.reportResult();
@@ -1406,7 +1580,7 @@
 
           const testFn = wrapTestFnWithSanitizers(
             definition.fn,
-            subStep.sanitizerOptions,
+            subStep.sanitizerOptions
           );
           const start = DateNow();
 
@@ -1414,13 +1588,13 @@
             await testFn(subStep);
 
             if (subStep.failedChildStepsCount() > 0) {
-              subStep.status = "failed";
+              subStep.status = 'failed';
             } else {
-              subStep.status = "ok";
+              subStep.status = 'ok';
             }
           } catch (error) {
             subStep.error = error;
-            subStep.status = "failed";
+            subStep.status = 'failed';
           }
 
           subStep.elapsed = DateNow() - start;
@@ -1428,7 +1602,7 @@
           if (subStep.parent?.finalized) {
             // always point this test out as one that was still running
             // if the parent step finalized
-            subStep.status = "pending";
+            subStep.status = 'pending';
           }
 
           subStep.finalized = true;
@@ -1437,7 +1611,7 @@
             subStep.reportResult();
           }
 
-          return subStep.status === "ok";
+          return subStep.status === 'ok';
         } finally {
           if (parentStep.canStreamReporting()) {
             // flush any buffered steps
@@ -1449,19 +1623,19 @@
 
         /** @returns {TestStepDefinition} */
         function getDefinition() {
-          if (typeof nameOrTestDefinition === "string") {
-            if (!(ObjectPrototypeIsPrototypeOf(FunctionPrototype, fn))) {
-              throw new TypeError("Expected function for second argument.");
+          if (typeof nameOrTestDefinition === 'string') {
+            if (!ObjectPrototypeIsPrototypeOf(FunctionPrototype, fn)) {
+              throw new TypeError('Expected function for second argument.');
             }
             return {
               name: nameOrTestDefinition,
               fn,
             };
-          } else if (typeof nameOrTestDefinition === "object") {
+          } else if (typeof nameOrTestDefinition === 'object') {
             return nameOrTestDefinition;
           } else {
             throw new TypeError(
-              "Expected a test definition or name and function.",
+              'Expected a test definition or name and function.'
             );
           }
         }
@@ -1505,7 +1679,7 @@
   }
 
   window.__bootstrap.internals = {
-    ...window.__bootstrap.internals ?? {},
+    ...(window.__bootstrap.internals ?? {}),
     runTests,
     runBenchmarks,
   };

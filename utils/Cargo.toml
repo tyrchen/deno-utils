@@ -1,6 +1,6 @@
 [package]
 name = "deno-utils"
-version = "0.6.1"
+version = "0.6.2"
 edition = "2021"
 license = "MIT"
 documentation = "https://docs.rs/deno-utils"
@@ -20,7 +20,7 @@ bundle = ["deno_graph"]
 [dependencies]
 async-trait = "0.1.56"
 data-url = "0.1.1"
-deno_core = "0.137.0"
+deno_core = "0.138.0"
 deno_graph = { version = "0.27.0", optional = true }
 dirs = "4.0.0"
 futures = "0.3.21"
@@ -28,9 +28,9 @@ mime = "0.3.16"
 phf = { version = "0.10.1", features = ["macros"] }
 pin-project = "1.0.10"
 reqwest = { version = "0.11.10", default-features = false, features = ["rustls-tls", "stream", "gzip", "brotli"] }
-tokio = { version = "1.19.0", features = ["rt", "rt-multi-thread", "fs"] }
+tokio = { version = "1.19.2", features = ["rt", "rt-multi-thread", "fs"] }
 
-deno-transpiler = { version = "0.3.2", path = "../transpiler", optional = true }
+deno-transpiler = { version = "0.3.3", path = "../transpiler", optional = true }
 
 [dev-dependencies]
-tokio = { version = "1.19.0", features = ["rt", "macros"] }
+tokio = { version = "1.19.2", features = ["rt", "macros"] }

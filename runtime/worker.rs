@@ -40,6 +40,19 @@ use derive_builder::Builder;
 
 pub type FormatJsErrorFn = dyn Fn(&JsError) -> String + Sync + Send;
 
+#[derive(Clone)]
+pub struct ExitCode(Arc<AtomicI32>);
+
+impl ExitCode {
+    pub fn get(&self) -> i32 {
+        self.0.load(Relaxed)
+    }
+
+    pub fn set(&mut self, code: i32) {
+        self.0.store(code, Relaxed);
+    }
+}
+
 /// This worker is created and used by almost all
 /// subcommands in Deno executable.
 ///
@@ -51,6 +64,7 @@ pub struct MainWorker {
     pub js_runtime: JsRuntime,
     main_module: Option<ModuleSpecifier>,
     should_break_on_first_statement: bool,
+    exit_code: ExitCode,
 }
 
 pub type RuntimeOptionsCallback = Rc<dyn Fn(RuntimeOptions) -> RuntimeOptions>;
@@ -117,6 +131,7 @@ impl MainWorker {
                 Ok(())
             })
             .build();
+        let exit_code = ExitCode(Arc::new(AtomicI32::new(0)));
 
         // Internal modules
         let mut extensions: Vec<Extension> = vec![
@@ -168,7 +183,7 @@ impl MainWorker {
                 unstable,
                 options.unsafely_ignore_certificate_errors.clone(),
             ),
-            ops::os::init(None),
+            ops::os::init(exit_code.clone()),
             ops::permissions::init(),
             ops::process::init(),
             ops::signal::init(),
@@ -224,6 +239,7 @@ impl MainWorker {
             js_runtime,
             main_module,
             should_break_on_first_statement: options.should_break_on_first_statement,
+            exit_code,
         }
     }
 
@@ -353,11 +369,8 @@ impl MainWorker {
 
     /// Return exit code set by the executed code (either in main worker
     /// or one of child web workers).
-    pub fn get_exit_code(&mut self) -> i32 {
-        let op_state_rc = self.js_runtime.op_state();
-        let op_state = op_state_rc.borrow();
-        let exit_code = op_state.borrow::<Arc<AtomicI32>>().load(Relaxed);
-        exit_code
+    pub fn get_exit_code(&self) -> i32 {
+        self.exit_code.get()
     }
 
     /// Dispatches "load" event to the JavaScript runtime.

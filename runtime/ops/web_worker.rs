@@ -6,7 +6,6 @@ use crate::web_worker::WebWorkerInternalHandle;
 use crate::web_worker::WebWorkerType;
 use deno_core::error::AnyError;
 use deno_core::op;
-
 use deno_core::CancelFuture;
 use deno_core::Extension;
 use deno_core::OpState;
