@@ -787,7 +787,7 @@ dependencies = [
 
 [[package]]
 name = "deno-utils"
-version = "0.6.2"
+version = "0.6.3"
 dependencies = [
  "async-trait",
  "data-url",
@@ -1005,7 +1005,7 @@ dependencies = [
 
 [[package]]
 name = "deno_simple_runtime"
-version = "0.64.0"
+version = "0.64.1"
 dependencies = [
  "atty",
  "deno-snapshot",

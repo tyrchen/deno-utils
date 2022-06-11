@@ -1,7 +1,8 @@
 use std::task::Poll;
 
-use deno_core::{error::AnyError, futures::channel::oneshot};
+use deno_core::error::AnyError;
 use futures::future::poll_fn;
+use tokio::sync::oneshot::{self, error::TryRecvError};
 
 pub struct ClientChannel<Req, Res> {
     rx: Option<oneshot::Receiver<Res>>,
@@ -43,8 +44,8 @@ impl<Req, Res> ClientChannel<Req, Res> {
     pub async fn recv(&mut self) -> Result<Res, AnyError> {
         if let Some(rx) = self.rx.as_mut() {
             poll_fn(move |_cx| match rx.try_recv() {
-                Ok(Some(v)) => Poll::Ready(Ok(v)),
-                Ok(None) => Poll::Pending,
+                Ok(res) => Poll::Ready(Ok(res)),
+                Err(TryRecvError::Empty) => Poll::Pending,
                 _ => Poll::Ready(Err(AnyError::msg("Error: failed to receive response"))),
             })
             .await
