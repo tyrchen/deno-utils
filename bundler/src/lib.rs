@@ -153,9 +153,11 @@ mod tests {
         let store = options.module_store.unwrap();
         let ret = store.get(m.as_str()).await;
         assert!(ret.is_ok());
-        let imported = resolve_url_or_path("https://deno.land/std@0.134.0/http/server.ts").unwrap();
-        let ret = store.get(imported.as_str()).await;
-        assert!(ret.is_ok());
+        let imported = resolve_url_or_path(
+            "https://cdn.jsdelivr.net/gh/denoland/deno_std@main/http/server.ts",
+        )
+        .unwrap();
+        let _ret = store.get(imported.as_str()).await.unwrap();
     }
 
     #[tokio::test]
