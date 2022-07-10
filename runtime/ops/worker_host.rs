@@ -11,7 +11,6 @@ use crate::web_worker::WebWorkerHandle;
 use crate::web_worker::WebWorkerType;
 use crate::web_worker::WorkerControlEvent;
 use crate::web_worker::WorkerId;
-use crate::worker::ExitCode;
 use crate::worker::FormatJsErrorFn;
 use deno_core::error::AnyError;
 use deno_core::futures::future::LocalFutureObj;
@@ -37,7 +36,6 @@ pub struct CreateWebWorkerArgs {
     pub permissions: Permissions,
     pub main_module: ModuleSpecifier,
     pub worker_type: WebWorkerType,
-    pub exit_code: ExitCode,
 }
 
 pub type CreateWebWorkerCb =
@@ -160,14 +158,13 @@ fn op_create_worker(state: &mut OpState, args: CreateWorkerArgs) -> Result<Worke
         parent_permissions.clone()
     };
     let parent_permissions = parent_permissions.clone();
-    let exit_code = state.borrow::<ExitCode>().clone();
     let worker_id = state.take::<WorkerId>();
     let create_web_worker_cb = state.take::<CreateWebWorkerCbHolder>();
     state.put::<CreateWebWorkerCbHolder>(create_web_worker_cb.clone());
     let preload_module_cb = state.take::<PreloadModuleCbHolder>();
     state.put::<PreloadModuleCbHolder>(preload_module_cb.clone());
     let format_js_error_fn = state.take::<FormatJsErrorFnHolder>();
-    state.put::<FormatJsErrorFnHolder>(format_js_error_fn);
+    state.put::<FormatJsErrorFnHolder>(format_js_error_fn.clone());
     state.put::<WorkerId>(worker_id.next().unwrap());
 
     let module_specifier = deno_core::resolve_url(&specifier)?;
@@ -193,7 +190,6 @@ fn op_create_worker(state: &mut OpState, args: CreateWorkerArgs) -> Result<Worke
             permissions: worker_permissions,
             main_module: module_specifier.clone(),
             worker_type,
-            exit_code,
         });
 
         // Send thread safe handle from newly created worker to host thread
@@ -209,6 +205,7 @@ fn op_create_worker(state: &mut OpState, args: CreateWorkerArgs) -> Result<Worke
             module_specifier,
             maybe_source_code,
             preload_module_cb.0,
+            format_js_error_fn.0,
         )
     })?;
 

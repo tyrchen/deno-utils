@@ -1,12 +1,11 @@
-use std::rc::Rc;
-
 use deno_ast::swc::{
     ast::Module,
     common::{Mark, SourceMap},
-    minifier::{
-        optimize,
-        option::{ExtraOptions, MangleOptions, MinifyOptions},
-    },
+};
+use std::rc::Rc;
+use swc_ecma_minifier::{
+    optimize,
+    option::{ExtraOptions, MangleOptions, MinifyOptions},
 };
 
 pub(crate) fn minify_module(program: Module) -> Module {

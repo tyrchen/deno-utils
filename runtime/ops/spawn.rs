@@ -144,6 +144,8 @@ fn create_command(state: &mut OpState, args: SpawnArgs) -> Result<std::process::
         command.uid(uid);
     }
     #[cfg(unix)]
+    // TODO(bartlomieju):
+    #[allow(clippy::undocumented_unsafe_blocks)]
     unsafe {
         command.pre_exec(|| {
             libc::setgroups(0, std::ptr::null());

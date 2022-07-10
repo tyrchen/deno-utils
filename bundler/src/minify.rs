@@ -2,12 +2,12 @@ use deno_ast::swc;
 use swc::{
     bundler::Bundle,
     common::{sync::Lrc, Mark, SourceMap},
-    minifier::{
-        optimize,
-        option::{ExtraOptions, MinifyOptions},
-    },
     transforms::fixer,
     visit::VisitMutWith,
+};
+use swc_ecma_minifier::{
+    optimize,
+    option::{ExtraOptions, MinifyOptions},
 };
 
 const MINIFY_CONFIG: &str = include_str!("config.json");

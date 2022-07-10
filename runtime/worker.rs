@@ -40,7 +40,7 @@ use derive_builder::Builder;
 
 pub type FormatJsErrorFn = dyn Fn(&JsError) -> String + Sync + Send;
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct ExitCode(Arc<AtomicI32>);
 
 impl ExitCode {
@@ -273,7 +273,8 @@ impl MainWorker {
         }
     }
 
-    async fn evaluate_module(&mut self, id: ModuleId) -> Result<(), AnyError> {
+    /// Executes specified JavaScript module.
+    pub async fn evaluate_module(&mut self, id: ModuleId) -> Result<(), AnyError> {
         let mut receiver = self.js_runtime.mod_evaluate(id);
         tokio::select! {
           // Not using biased mode leads to non-determinism for relatively simple

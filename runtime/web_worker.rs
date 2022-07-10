@@ -7,7 +7,6 @@ use crate::ops;
 use crate::ops::io::Stdio;
 use crate::permissions::Permissions;
 use crate::tokio_util::run_basic;
-use crate::worker::ExitCode;
 use crate::worker::FormatJsErrorFn;
 use crate::BootstrapOptions;
 use deno_broadcast_channel::InMemoryBroadcastChannel;
@@ -329,7 +328,6 @@ pub struct WebWorkerOptions {
     pub broadcast_channel: InMemoryBroadcastChannel,
     pub shared_array_buffer_store: Option<SharedArrayBufferStore>,
     pub compiled_wasm_module_store: Option<CompiledWasmModuleStore>,
-    pub exit_code: ExitCode,
     pub stdio: Stdio,
 
     pub permissions: Permissions,
@@ -416,7 +414,7 @@ impl WebWorker {
                 unstable,
                 options.unsafely_ignore_certificate_errors.clone(),
             ),
-            ops::os::init(options.exit_code),
+            ops::os::init_for_worker(),
             ops::permissions::init(),
             ops::process::init(),
             ops::spawn::init(),
@@ -621,7 +619,14 @@ impl WebWorker {
     }
 }
 
-fn print_worker_error(error_str: String, name: &str) {
+fn print_worker_error(error: &AnyError, name: &str, format_js_error_fn: Option<&FormatJsErrorFn>) {
+    let error_str = match format_js_error_fn {
+        Some(format_js_error_fn) => match error.downcast_ref::<JsError>() {
+            Some(js_error) => format_js_error_fn(js_error),
+            None => error.to_string(),
+        },
+        None => error.to_string(),
+    };
     eprintln!(
         "{}: Uncaught (in worker \"{}\") {}",
         colors::red_bold("error"),
@@ -637,6 +642,7 @@ pub fn run_web_worker(
     specifier: ModuleSpecifier,
     maybe_source_code: Option<String>,
     preload_module_cb: Arc<ops::worker_host::PreloadModuleCb>,
+    format_js_error_fn: Option<Arc<FormatJsErrorFn>>,
 ) -> Result<(), AnyError> {
     let name = worker.name.to_string();
 
@@ -650,7 +656,7 @@ pub fn run_web_worker(
         let mut worker = match result {
             Ok(worker) => worker,
             Err(e) => {
-                print_worker_error(e.to_string(), &name);
+                print_worker_error(&e, &name, format_js_error_fn.as_deref());
                 internal_handle
                     .post_event(WorkerControlEvent::TerminalError(e))
                     .expect("Failed to post message to host");
@@ -690,7 +696,7 @@ pub fn run_web_worker(
         };
 
         if let Err(e) = result {
-            print_worker_error(e.to_string(), &name);
+            print_worker_error(&e, &name, format_js_error_fn.as_deref());
             internal_handle
                 .post_event(WorkerControlEvent::TerminalError(e))
                 .expect("Failed to post message to host");
