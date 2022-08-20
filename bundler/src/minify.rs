@@ -18,7 +18,7 @@ pub fn minify(cm: Lrc<SourceMap>, modules: Vec<Bundle>) -> Vec<Bundle> {
         .into_iter()
         .map(|mut b| {
             b.module = optimize(
-                b.module,
+                b.module.into(),
                 cm.clone(),
                 None,
                 None,
@@ -27,7 +27,8 @@ pub fn minify(cm: Lrc<SourceMap>, modules: Vec<Bundle>) -> Vec<Bundle> {
                     unresolved_mark: Mark::fresh(Mark::root()),
                     top_level_mark: Mark::fresh(Mark::root()),
                 },
-            );
+            )
+            .expect_module();
             b.module.visit_mut_with(&mut fixer(None));
             b
         })

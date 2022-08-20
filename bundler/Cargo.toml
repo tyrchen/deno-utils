@@ -18,14 +18,14 @@ categories = ["development-tools::build-utils"]
 [dependencies]
 askama = "0.11.1"
 base64 = "0.13.0"
-deno_ast = { version = "0.16.0", features = ["bundler"] }
+deno_ast = { version = "0.17.0", features = ["bundler"] }
 deno_core = "0.147.0"
-deno_graph = "0.28.0"
+deno_graph = "0.30.0"
 derive_builder = "0.11.2"
 futures = "0.3.23"
 serde = { version = "1.0.143", features = ["derive"] }
 serde_json = "1.0.83"
-swc_ecma_minifier = "0.120.2"
+swc_ecma_minifier = "0.136.1"
 
 deno-utils = { version = "0.7.0", path = "../utils", features = ["bundle", "transpile"] }
 

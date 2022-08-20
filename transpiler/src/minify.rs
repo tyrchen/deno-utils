@@ -21,7 +21,7 @@ pub(crate) fn minify_module(program: Module) -> Module {
         ..Default::default()
     };
     optimize(
-        program,
+        program.into(),
         cm,
         None,
         None,
@@ -31,4 +31,5 @@ pub(crate) fn minify_module(program: Module) -> Module {
             unresolved_mark,
         },
     )
+    .expect_module()
 }
