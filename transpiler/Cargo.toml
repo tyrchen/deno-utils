@@ -1,6 +1,6 @@
 [package]
 name = "deno-transpiler"
-version = "0.3.4"
+version = "0.4.0"
 edition = "2021"
 license = "MIT"
 documentation = "https://docs.rs/deno-transpiler"
@@ -18,7 +18,7 @@ categories = ["development-tools::build-utils"]
 [dependencies]
 # deno_ast = { version = "0.15.0", features = ["minifier", "module_specifier", "transpiling"] }
 deno_ast = { version = "0.16.0", features = ["bundler", "transpiling"] }
-deno_core = "0.142.0"
+deno_core = "0.147.0"
 swc_ecma_minifier = "0.120.2"
 
 [dev-dependencies]

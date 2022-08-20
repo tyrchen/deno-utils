@@ -315,79 +315,49 @@ fn seek_helper(args: SeekArgs) -> Result<(u32, SeekFrom), AnyError> {
 #[op]
 fn op_seek_sync(state: &mut OpState, args: SeekArgs) -> Result<u64, AnyError> {
     let (rid, seek_from) = seek_helper(args)?;
-    let pos = StdFileResource::with_file(state, rid, |std_file| {
+    StdFileResource::with_file(state, rid, |std_file| {
         std_file.seek(seek_from).map_err(AnyError::from)
-    })?;
-    Ok(pos)
+    })
 }
 
 #[op]
 async fn op_seek_async(state: Rc<RefCell<OpState>>, args: SeekArgs) -> Result<u64, AnyError> {
     let (rid, seek_from) = seek_helper(args)?;
 
-    let resource = state
-        .borrow_mut()
-        .resource_table
-        .get::<StdFileResource>(rid)?;
-
-    let std_file = resource.std_file();
-
-    tokio::task::spawn_blocking(move || {
-        let mut std_file = std_file.lock();
-        std_file.seek(seek_from)
+    StdFileResource::with_file_blocking_task(state, rid, move |std_file| {
+        std_file.seek(seek_from).map_err(AnyError::from)
     })
-    .await?
-    .map_err(AnyError::from)
+    .await
 }
 
 #[op]
 fn op_fdatasync_sync(state: &mut OpState, rid: ResourceId) -> Result<(), AnyError> {
     StdFileResource::with_file(state, rid, |std_file| {
         std_file.sync_data().map_err(AnyError::from)
-    })?;
-    Ok(())
+    })
 }
 
 #[op]
 async fn op_fdatasync_async(state: Rc<RefCell<OpState>>, rid: ResourceId) -> Result<(), AnyError> {
-    let resource = state
-        .borrow_mut()
-        .resource_table
-        .get::<StdFileResource>(rid)?;
-
-    let std_file = resource.std_file();
-
-    tokio::task::spawn_blocking(move || {
-        let std_file = std_file.lock();
-        std_file.sync_data()
+    StdFileResource::with_file_blocking_task(state, rid, move |std_file| {
+        std_file.sync_data().map_err(AnyError::from)
     })
-    .await?
-    .map_err(AnyError::from)
+    .await
 }
 
 #[op]
 fn op_fsync_sync(state: &mut OpState, rid: ResourceId) -> Result<(), AnyError> {
     StdFileResource::with_file(state, rid, |std_file| {
         std_file.sync_all().map_err(AnyError::from)
-    })?;
-    Ok(())
+    })
 }
 
 #[op]
 async fn op_fsync_async(state: Rc<RefCell<OpState>>, rid: ResourceId) -> Result<(), AnyError> {
-    let resource = state
-        .borrow_mut()
-        .resource_table
-        .get::<StdFileResource>(rid)?;
-
-    let std_file = resource.std_file();
-
-    tokio::task::spawn_blocking(move || {
-        let std_file = std_file.lock();
-        std_file.sync_all()
+    StdFileResource::with_file_blocking_task(state, rid, move |std_file| {
+        std_file.sync_all().map_err(AnyError::from)
     })
-    .await?
-    .map_err(AnyError::from)
+    .await
 }
 
 #[op]
@@ -400,19 +370,10 @@ fn op_fstat_sync(state: &mut OpState, rid: ResourceId) -> Result<FsStat, AnyErro
 
 #[op]
 async fn op_fstat_async(state: Rc<RefCell<OpState>>, rid: ResourceId) -> Result<FsStat, AnyError> {
-    let resource = state
-        .borrow_mut()
-        .resource_table
-        .get::<StdFileResource>(rid)?;
-
-    let std_file = resource.std_file();
-
-    let metadata = tokio::task::spawn_blocking(move || {
-        let std_file = std_file.lock();
-        std_file.metadata()
+    let metadata = StdFileResource::with_file_blocking_task(state, rid, move |std_file| {
+        std_file.metadata().map_err(AnyError::from)
     })
-    .await?
-    .map_err(AnyError::from)?;
+    .await?;
     Ok(get_stat(metadata))
 }
 
@@ -440,15 +401,7 @@ async fn op_flock_async(
     use fs3::FileExt;
     super::check_unstable2(&state, "Deno.flock");
 
-    let resource = state
-        .borrow_mut()
-        .resource_table
-        .get::<StdFileResource>(rid)?;
-
-    let std_file = resource.std_file();
-
-    tokio::task::spawn_blocking(move || -> Result<(), AnyError> {
-        let std_file = std_file.lock();
+    StdFileResource::with_file_blocking_task(state, rid, move |std_file| {
         if exclusive {
             std_file.lock_exclusive()?;
         } else {
@@ -456,7 +409,7 @@ async fn op_flock_async(
         }
         Ok(())
     })
-    .await?
+    .await
 }
 
 #[op]
@@ -475,19 +428,11 @@ async fn op_funlock_async(state: Rc<RefCell<OpState>>, rid: ResourceId) -> Resul
     use fs3::FileExt;
     super::check_unstable2(&state, "Deno.funlock");
 
-    let resource = state
-        .borrow_mut()
-        .resource_table
-        .get::<StdFileResource>(rid)?;
-
-    let std_file = resource.std_file();
-
-    tokio::task::spawn_blocking(move || -> Result<(), AnyError> {
-        let std_file = std_file.lock();
+    StdFileResource::with_file_blocking_task(state, rid, move |std_file| {
         std_file.unlock()?;
         Ok(())
     })
-    .await?
+    .await
 }
 
 #[op]
@@ -1492,19 +1437,11 @@ async fn op_ftruncate_async(
     let rid = args.rid;
     let len = args.len as u64;
 
-    let resource = state
-        .borrow_mut()
-        .resource_table
-        .get::<StdFileResource>(rid)?;
-
-    let std_file = resource.std_file();
-
-    tokio::task::spawn_blocking(move || {
-        let std_file = std_file.lock();
-        std_file.set_len(len)
+    StdFileResource::with_file_blocking_task(state, rid, move |std_file| {
+        std_file.set_len(len)?;
+        Ok(())
     })
-    .await?
-    .map_err(AnyError::from)
+    .await
 }
 
 #[derive(Deserialize)]
@@ -1768,19 +1705,11 @@ async fn op_futime_async(state: Rc<RefCell<OpState>>, args: FutimeArgs) -> Resul
     let atime = filetime::FileTime::from_unix_time(args.atime.0, args.atime.1);
     let mtime = filetime::FileTime::from_unix_time(args.mtime.0, args.mtime.1);
 
-    let resource = state
-        .borrow_mut()
-        .resource_table
-        .get::<StdFileResource>(rid)?;
-
-    let std_file = resource.std_file();
-    tokio::task::spawn_blocking(move || {
-        let std_file = std_file.lock();
-        filetime::set_file_handle_times(&std_file, Some(atime), Some(mtime))?;
+    StdFileResource::with_file_blocking_task(state, rid, move |std_file| {
+        filetime::set_file_handle_times(std_file, Some(atime), Some(mtime))?;
         Ok(())
     })
     .await
-    .unwrap()
 }
 
 #[derive(Deserialize)]

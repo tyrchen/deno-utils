@@ -1,8 +1,8 @@
 // Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
-'use strict';
+"use strict";
 
-// Removes the `__proto__` for security reasons.  This intentionally makes
-// Deno non compliant with ECMA-262 Annex B.2.2.1
+// Removes the `__proto__` for security reasons.
+// https://tc39.es/ecma262/#sec-get-object.prototype.__proto__
 delete Object.prototype.__proto__;
 
 // Remove Intl.v8BreakIterator because it is a non-standard API.
@@ -10,7 +10,12 @@ delete Intl.v8BreakIterator;
 
 ((window) => {
   const core = Deno.core;
+  const ops = core.ops;
   const {
+    ArrayPrototypeIndexOf,
+    ArrayPrototypePush,
+    ArrayPrototypeShift,
+    ArrayPrototypeSplice,
     ArrayPrototypeMap,
     DateNow,
     Error,
@@ -27,7 +32,11 @@ delete Intl.v8BreakIterator;
     SymbolFor,
     SymbolIterator,
     PromisePrototypeThen,
+    SafeWeakMap,
     TypeError,
+    WeakMapPrototypeDelete,
+    WeakMapPrototypeGet,
+    WeakMapPrototypeSet,
   } = window.__bootstrap.primordials;
   const util = window.__bootstrap.util;
   const eventTarget = window.__bootstrap.eventTarget;
@@ -98,7 +107,7 @@ delete Intl.v8BreakIterator;
     }
 
     isClosing = true;
-    core.opSync('op_worker_close');
+    ops.op_worker_close();
   }
 
   function postMessage(message, transferOrOptions = {}) {
@@ -108,13 +117,13 @@ delete Intl.v8BreakIterator;
     message = webidl.converters.any(message);
     let options;
     if (
-      webidl.type(transferOrOptions) === 'Object' &&
+      webidl.type(transferOrOptions) === "Object" &&
       transferOrOptions !== undefined &&
       transferOrOptions[SymbolIterator] !== undefined
     ) {
-      const transfer = webidl.converters['sequence<object>'](
+      const transfer = webidl.converters["sequence<object>"](
         transferOrOptions,
-        { prefix, context: 'Argument 2' }
+        { prefix, context: "Argument 2" }
       );
       options = { transfer };
     } else {
@@ -122,13 +131,13 @@ delete Intl.v8BreakIterator;
         transferOrOptions,
         {
           prefix,
-          context: 'Argument 2',
+          context: "Argument 2",
         }
       );
     }
     const { transfer } = options;
     const data = serializeJsMessageData(message, transfer);
-    core.opSync('op_worker_post_message', data);
+    ops.op_worker_post_message(data);
   }
 
   let isClosing = false;
@@ -142,13 +151,13 @@ delete Intl.v8BreakIterator;
       );
     }
     while (!isClosing) {
-      const data = await core.opAsync('op_worker_recv_message');
+      const data = await core.opAsync("op_worker_recv_message");
       if (data === null) break;
       const v = deserializeJsMessageData(data);
       const message = v[0];
       const transferables = v[1];
 
-      const msgEvent = new MessageEvent('message', {
+      const msgEvent = new MessageEvent("message", {
         cancelable: false,
         data: message,
         ports: transferables.filter((t) =>
@@ -159,7 +168,7 @@ delete Intl.v8BreakIterator;
       try {
         globalDispatchEvent(msgEvent);
       } catch (e) {
-        const errorEvent = new ErrorEvent('error', {
+        const errorEvent = new ErrorEvent("error", {
           cancelable: true,
           message: e.message,
           lineno: e.lineNumber ? e.lineNumber + 1 : undefined,
@@ -179,7 +188,7 @@ delete Intl.v8BreakIterator;
   let loadedMainWorkerScript = false;
 
   function importScripts(...urls) {
-    if (core.opSync('op_worker_get_type') === 'module') {
+    if (ops.op_worker_get_type() === "module") {
       throw new TypeError("Can't import scripts in a module worker.");
     }
 
@@ -189,8 +198,8 @@ delete Intl.v8BreakIterator;
         return new url.URL(scriptUrl, baseUrl ?? undefined).href;
       } catch {
         throw new domException.DOMException(
-          'Failed to parse URL.',
-          'SyntaxError'
+          "Failed to parse URL.",
+          "SyntaxError"
         );
       }
     });
@@ -199,8 +208,7 @@ delete Intl.v8BreakIterator;
     // imported scripts, so we use `loadedMainWorkerScript` to distinguish them.
     // TODO(andreubotella) Refactor worker creation so the main script isn't
     // loaded with `importScripts()`.
-    const scripts = core.opSync(
-      'op_worker_sync_fetch',
+    const scripts = ops.op_worker_sync_fetch(
       parsedUrls,
       !loadedMainWorkerScript
     );
@@ -215,13 +223,13 @@ delete Intl.v8BreakIterator;
   }
 
   function opMainModule() {
-    return core.opSync('op_main_module');
+    return ops.op_main_module();
   }
 
   function formatException(error) {
     if (error instanceof Error) {
       return null;
-    } else if (typeof error == 'string') {
+    } else if (typeof error == "string") {
       return `Uncaught ${inspectArgs([quoteString(error)], {
         colors: !colors.getNoColor(),
       })}`;
@@ -234,8 +242,9 @@ delete Intl.v8BreakIterator;
 
   function runtimeStart(runtimeOptions, source) {
     core.setMacrotaskCallback(timers.handleTimerMacrotask);
+    core.setMacrotaskCallback(promiseRejectMacrotaskCallback);
     core.setWasmStreamingCallback(fetch.handleWasmStreaming);
-    core.opSync('op_set_format_exception_callback', formatException);
+    ops.op_set_format_exception_callback(formatException);
     version.setVersions(
       runtimeOptions.denoVersion,
       runtimeOptions.v8Version,
@@ -248,65 +257,65 @@ delete Intl.v8BreakIterator;
   }
 
   function registerErrors() {
-    core.registerErrorClass('NotFound', errors.NotFound);
-    core.registerErrorClass('PermissionDenied', errors.PermissionDenied);
-    core.registerErrorClass('ConnectionRefused', errors.ConnectionRefused);
-    core.registerErrorClass('ConnectionReset', errors.ConnectionReset);
-    core.registerErrorClass('ConnectionAborted', errors.ConnectionAborted);
-    core.registerErrorClass('NotConnected', errors.NotConnected);
-    core.registerErrorClass('AddrInUse', errors.AddrInUse);
-    core.registerErrorClass('AddrNotAvailable', errors.AddrNotAvailable);
-    core.registerErrorClass('BrokenPipe', errors.BrokenPipe);
-    core.registerErrorClass('AlreadyExists', errors.AlreadyExists);
-    core.registerErrorClass('InvalidData', errors.InvalidData);
-    core.registerErrorClass('TimedOut', errors.TimedOut);
-    core.registerErrorClass('Interrupted', errors.Interrupted);
-    core.registerErrorClass('WriteZero', errors.WriteZero);
-    core.registerErrorClass('UnexpectedEof', errors.UnexpectedEof);
-    core.registerErrorClass('BadResource', errors.BadResource);
-    core.registerErrorClass('Http', errors.Http);
-    core.registerErrorClass('Busy', errors.Busy);
-    core.registerErrorClass('NotSupported', errors.NotSupported);
+    core.registerErrorClass("NotFound", errors.NotFound);
+    core.registerErrorClass("PermissionDenied", errors.PermissionDenied);
+    core.registerErrorClass("ConnectionRefused", errors.ConnectionRefused);
+    core.registerErrorClass("ConnectionReset", errors.ConnectionReset);
+    core.registerErrorClass("ConnectionAborted", errors.ConnectionAborted);
+    core.registerErrorClass("NotConnected", errors.NotConnected);
+    core.registerErrorClass("AddrInUse", errors.AddrInUse);
+    core.registerErrorClass("AddrNotAvailable", errors.AddrNotAvailable);
+    core.registerErrorClass("BrokenPipe", errors.BrokenPipe);
+    core.registerErrorClass("AlreadyExists", errors.AlreadyExists);
+    core.registerErrorClass("InvalidData", errors.InvalidData);
+    core.registerErrorClass("TimedOut", errors.TimedOut);
+    core.registerErrorClass("Interrupted", errors.Interrupted);
+    core.registerErrorClass("WriteZero", errors.WriteZero);
+    core.registerErrorClass("UnexpectedEof", errors.UnexpectedEof);
+    core.registerErrorClass("BadResource", errors.BadResource);
+    core.registerErrorClass("Http", errors.Http);
+    core.registerErrorClass("Busy", errors.Busy);
+    core.registerErrorClass("NotSupported", errors.NotSupported);
     core.registerErrorBuilder(
-      'DOMExceptionOperationError',
+      "DOMExceptionOperationError",
       function DOMExceptionOperationError(msg) {
-        return new domException.DOMException(msg, 'OperationError');
+        return new domException.DOMException(msg, "OperationError");
       }
     );
     core.registerErrorBuilder(
-      'DOMExceptionQuotaExceededError',
+      "DOMExceptionQuotaExceededError",
       function DOMExceptionQuotaExceededError(msg) {
-        return new domException.DOMException(msg, 'QuotaExceededError');
+        return new domException.DOMException(msg, "QuotaExceededError");
       }
     );
     core.registerErrorBuilder(
-      'DOMExceptionNotSupportedError',
+      "DOMExceptionNotSupportedError",
       function DOMExceptionNotSupportedError(msg) {
-        return new domException.DOMException(msg, 'NotSupported');
+        return new domException.DOMException(msg, "NotSupported");
       }
     );
     core.registerErrorBuilder(
-      'DOMExceptionNetworkError',
+      "DOMExceptionNetworkError",
       function DOMExceptionNetworkError(msg) {
-        return new domException.DOMException(msg, 'NetworkError');
+        return new domException.DOMException(msg, "NetworkError");
       }
     );
     core.registerErrorBuilder(
-      'DOMExceptionAbortError',
+      "DOMExceptionAbortError",
       function DOMExceptionAbortError(msg) {
-        return new domException.DOMException(msg, 'AbortError');
+        return new domException.DOMException(msg, "AbortError");
       }
     );
     core.registerErrorBuilder(
-      'DOMExceptionInvalidCharacterError',
+      "DOMExceptionInvalidCharacterError",
       function DOMExceptionInvalidCharacterError(msg) {
-        return new domException.DOMException(msg, 'InvalidCharacterError');
+        return new domException.DOMException(msg, "InvalidCharacterError");
       }
     );
     core.registerErrorBuilder(
-      'DOMExceptionDataError',
+      "DOMExceptionDataError",
       function DOMExceptionDataError(msg) {
-        return new domException.DOMException(msg, 'DataError');
+        return new domException.DOMException(msg, "DataError");
       }
     );
   }
@@ -316,7 +325,7 @@ delete Intl.v8BreakIterator;
       webidl.illegalConstructor();
     }
 
-    [SymbolFor('Deno.privateCustomInspect')](inspect) {
+    [SymbolFor("Deno.privateCustomInspect")](inspect) {
       return `${this.constructor.name} ${inspect({})}`;
     }
   }
@@ -358,7 +367,7 @@ delete Intl.v8BreakIterator;
       webidl.illegalConstructor();
     }
 
-    [SymbolFor('Deno.privateCustomInspect')](inspect) {
+    [SymbolFor("Deno.privateCustomInspect")](inspect) {
       return `${this.constructor.name} ${inspect({})}`;
     }
   }
@@ -410,6 +419,7 @@ delete Intl.v8BreakIterator;
     PerformanceEntry: util.nonEnumerable(performance.PerformanceEntry),
     PerformanceMark: util.nonEnumerable(performance.PerformanceMark),
     PerformanceMeasure: util.nonEnumerable(performance.PerformanceMeasure),
+    PromiseRejectionEvent: util.nonEnumerable(PromiseRejectionEvent),
     ProgressEvent: util.nonEnumerable(ProgressEvent),
     ReadableStream: util.nonEnumerable(streams.ReadableStream),
     ReadableStreamDefaultReader: util.nonEnumerable(
@@ -552,47 +562,81 @@ delete Intl.v8BreakIterator;
     postMessage: util.writable(postMessage),
   };
 
+  const pendingRejections = [];
+  const pendingRejectionsReasons = new SafeWeakMap();
+
+  function promiseRejectCallback(type, promise, reason) {
+    switch (type) {
+      case 0: {
+        ops.op_store_pending_promise_exception(promise, reason);
+        ArrayPrototypePush(pendingRejections, promise);
+        WeakMapPrototypeSet(pendingRejectionsReasons, promise, reason);
+        break;
+      }
+      case 1: {
+        ops.op_remove_pending_promise_exception(promise);
+        const index = ArrayPrototypeIndexOf(pendingRejections, promise);
+        if (index > -1) {
+          ArrayPrototypeSplice(pendingRejections, index, 1);
+          WeakMapPrototypeDelete(pendingRejectionsReasons, promise);
+        }
+        break;
+      }
+      default:
+        return false;
+    }
+
+    return (
+      !!globalThis.onunhandledrejection ||
+      eventTarget.listenerCount(globalThis, "unhandledrejection") > 0
+    );
+  }
+
+  function promiseRejectMacrotaskCallback() {
+    while (pendingRejections.length > 0) {
+      const promise = ArrayPrototypeShift(pendingRejections);
+      const hasPendingException = ops.op_has_pending_promise_exception(promise);
+      const reason = WeakMapPrototypeGet(pendingRejectionsReasons, promise);
+      WeakMapPrototypeDelete(pendingRejectionsReasons, promise);
+
+      if (!hasPendingException) {
+        continue;
+      }
+
+      const event = new PromiseRejectionEvent("unhandledrejection", {
+        cancelable: true,
+        promise,
+        reason,
+      });
+
+      const errorEventCb = (event) => {
+        if (event.error === reason) {
+          ops.op_remove_pending_promise_exception(promise);
+        }
+      };
+      // Add a callback for "error" event - it will be dispatched
+      // if error is thrown during dispatch of "unhandledrejection"
+      // event.
+      globalThis.addEventListener("error", errorEventCb);
+      globalThis.dispatchEvent(event);
+      globalThis.removeEventListener("error", errorEventCb);
+
+      // If event was not prevented (or "unhandledrejection" listeners didn't
+      // throw) we will let Rust side handle it.
+      if (event.defaultPrevented) {
+        ops.op_remove_pending_promise_exception(promise);
+      }
+    }
+    return true;
+  }
+
   let hasBootstrapped = false;
 
   function bootstrapMainRuntime(runtimeOptions) {
     if (hasBootstrapped) {
-      throw new Error('Worker runtime already bootstrapped');
+      throw new Error("Worker runtime already bootstrapped");
     }
 
-    performance.setTimeOrigin(DateNow());
-    const consoleFromV8 = window.console;
-    const wrapConsole = window.__bootstrap.console.wrapConsole;
-
-    // Remove bootstrapping data from the global scope
-    delete globalThis.__bootstrap;
-    delete globalThis.bootstrap;
-    util.log('bootstrapMainRuntime');
-    hasBootstrapped = true;
-    ObjectDefineProperties(globalThis, windowOrWorkerGlobalScope);
-    if (runtimeOptions.unstableFlag) {
-      ObjectDefineProperties(globalThis, unstableWindowOrWorkerGlobalScope);
-    }
-    ObjectDefineProperties(globalThis, mainRuntimeGlobalProperties);
-    ObjectSetPrototypeOf(globalThis, Window.prototype);
-
-    const consoleFromDeno = globalThis.console;
-    wrapConsole(consoleFromDeno, consoleFromV8);
-
-    eventTarget.setEventTargetData(globalThis);
-
-    defineEventHandler(window, 'error');
-    defineEventHandler(window, 'load');
-    defineEventHandler(window, 'unload');
-    const isUnloadDispatched = SymbolFor('isUnloadDispatched');
-    // Stores the flag for checking whether unload is dispatched or not.
-    // This prevents the recursive dispatches of unload events.
-    // See https://github.com/denoland/deno/issues/9201.
-    window[isUnloadDispatched] = false;
-    window.addEventListener('unload', () => {
-      window[isUnloadDispatched] = true;
-    });
-
-    runtimeStart(runtimeOptions);
     const {
       args,
       location: locationHref,
@@ -605,15 +649,64 @@ delete Intl.v8BreakIterator;
       userAgent: userAgentInfo,
     } = runtimeOptions;
 
-    colors.setNoColor(noColor || !isTty);
-    if (locationHref != null) {
+    performance.setTimeOrigin(DateNow());
+    const consoleFromV8 = window.console;
+    const wrapConsole = window.__bootstrap.console.wrapConsole;
+
+    // Remove bootstrapping data from the global scope
+    delete globalThis.__bootstrap;
+    delete globalThis.bootstrap;
+    util.log("bootstrapMainRuntime");
+    hasBootstrapped = true;
+
+    // If the `--location` flag isn't set, make `globalThis.location` `undefined` and
+    // writable, so that they can mock it themselves if they like. If the flag was
+    // set, define `globalThis.location`, using the provided value.
+    if (locationHref == null) {
+      mainRuntimeGlobalProperties.location = {
+        writable: true,
+      };
+    } else {
       location.setLocationHref(locationHref);
     }
+
+    ObjectDefineProperties(globalThis, windowOrWorkerGlobalScope);
+    if (runtimeOptions.unstableFlag) {
+      ObjectDefineProperties(globalThis, unstableWindowOrWorkerGlobalScope);
+    }
+    ObjectDefineProperties(globalThis, mainRuntimeGlobalProperties);
+    ObjectSetPrototypeOf(globalThis, Window.prototype);
+
+    const consoleFromDeno = globalThis.console;
+    wrapConsole(consoleFromDeno, consoleFromV8);
+
+    eventTarget.setEventTargetData(globalThis);
+
+    defineEventHandler(window, "error");
+    defineEventHandler(window, "load");
+    defineEventHandler(window, "beforeunload");
+    defineEventHandler(window, "unload");
+    defineEventHandler(window, "unhandledrejection");
+
+    core.setPromiseRejectCallback(promiseRejectCallback);
+
+    const isUnloadDispatched = SymbolFor("isUnloadDispatched");
+    // Stores the flag for checking whether unload is dispatched or not.
+    // This prevents the recursive dispatches of unload events.
+    // See https://github.com/denoland/deno/issues/9201.
+    window[isUnloadDispatched] = false;
+    window.addEventListener("unload", () => {
+      window[isUnloadDispatched] = true;
+    });
+
+    runtimeStart(runtimeOptions);
+
+    colors.setNoColor(noColor || !isTty);
     numCpus = cpuCount;
     userAgent = userAgentInfo;
     registerErrors();
 
-    const internalSymbol = Symbol('Deno.internal');
+    const internalSymbol = Symbol("Deno.internal");
 
     const finalDenoNs = {
       core,
@@ -637,15 +730,15 @@ delete Intl.v8BreakIterator;
 
     // Setup `Deno` global - we're actually overriding already existing global
     // `Deno` with `Deno` namespace from "./deno.ts".
-    ObjectDefineProperty(globalThis, 'Deno', util.readOnly(finalDenoNs));
+    ObjectDefineProperty(globalThis, "Deno", util.readOnly(finalDenoNs));
     ObjectFreeze(globalThis.Deno.core);
 
-    util.log('args', args);
+    util.log("args", args);
   }
 
   function bootstrapWorkerRuntime(runtimeOptions, name, internalName) {
     if (hasBootstrapped) {
-      throw new Error('Worker runtime already bootstrapped');
+      throw new Error("Worker runtime already bootstrapped");
     }
 
     performance.setTimeOrigin(DateNow());
@@ -655,7 +748,7 @@ delete Intl.v8BreakIterator;
     // Remove bootstrapping data from the global scope
     delete globalThis.__bootstrap;
     delete globalThis.bootstrap;
-    util.log('bootstrapWorkerRuntime');
+    util.log("bootstrapWorkerRuntime");
     hasBootstrapped = true;
     ObjectDefineProperties(globalThis, windowOrWorkerGlobalScope);
     if (runtimeOptions.unstableFlag) {
@@ -666,7 +759,7 @@ delete Intl.v8BreakIterator;
     if (runtimeOptions.enableTestingFeaturesFlag) {
       ObjectDefineProperty(
         globalThis,
-        'importScripts',
+        "importScripts",
         util.writable(importScripts)
       );
     }
@@ -677,8 +770,12 @@ delete Intl.v8BreakIterator;
 
     eventTarget.setEventTargetData(globalThis);
 
-    defineEventHandler(self, 'message');
-    defineEventHandler(self, 'error', undefined, true);
+    defineEventHandler(self, "message");
+    defineEventHandler(self, "error", undefined, true);
+    defineEventHandler(self, "unhandledrejection");
+
+    core.setPromiseRejectCallback(promiseRejectCallback);
+
     // `Deno.exit()` is an alias to `self.close()`. Setting and exit
     // code using an op in worker context is a no-op.
     os.setExitHandler((_exitCode) => {
@@ -703,7 +800,7 @@ delete Intl.v8BreakIterator;
 
     globalThis.pollForMessages = pollForMessages;
 
-    const internalSymbol = Symbol('Deno.internal');
+    const internalSymbol = Symbol("Deno.internal");
 
     const finalDenoNs = {
       core,
@@ -723,7 +820,7 @@ delete Intl.v8BreakIterator;
     });
     // Setup `Deno` global - we're actually overriding already
     // existing global `Deno` with `Deno` namespace from "./deno.ts".
-    ObjectDefineProperty(globalThis, 'Deno', util.readOnly(finalDenoNs));
+    ObjectDefineProperty(globalThis, "Deno", util.readOnly(finalDenoNs));
     ObjectFreeze(globalThis.Deno.core);
   }
 

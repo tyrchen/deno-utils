@@ -1,4 +1,5 @@
 // Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
+#![allow(clippy::derive_partial_eq_without_eq)]
 
 pub use deno_broadcast_channel;
 pub use deno_console;
@@ -9,6 +10,7 @@ pub use deno_fetch;
 pub use deno_ffi;
 pub use deno_http;
 pub use deno_net;
+pub use deno_node;
 pub use deno_tls;
 pub use deno_url;
 pub use deno_web;

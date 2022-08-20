@@ -1,6 +1,6 @@
 [package]
 name = "deno-snapshot"
-version = "0.5.4"
+version = "0.6.0"
 edition = "2021"
 license = "MIT"
 documentation = "https://docs.rs/deno-snapshot"
@@ -16,22 +16,22 @@ categories = ["development-tools"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-deno_core = "0.142.0"
+deno_core = "0.147.0"
 
-deno_broadcast_channel = { version = "0.54.0", optional = true }
-deno_console = { version = "0.60.0", optional = true }
-deno_crypto = { version = "0.74.0", optional = true }
-deno_fetch = { version = "0.83.0", optional = true }
-deno_ffi = { version = "0.47.0", optional = true }
-deno_http = { version = "0.54.0", optional = true }
-deno_net = { version = "0.52.0", optional = true }
-deno_tls = { version = "0.47.0", optional = true }
-deno_url = { version = "0.60.0", optional = true }
-deno_web = { version = "0.91.0", optional = true }
-deno_webgpu = { version = "0.61.0", optional = true }
-deno_webidl = { version = "0.60.0", optional = true }
-deno_websocket = { version = "0.65.0", optional = true }
-deno_webstorage = { version = "0.55.0", optional = true }
+deno_broadcast_channel = { version = "0.59.0", optional = true }
+deno_console = { version = "0.65.0", optional = true }
+deno_crypto = { version = "0.79.0", optional = true }
+deno_fetch = { version = "0.88.0", optional = true }
+deno_ffi = { version = "0.52.0", optional = true }
+deno_http = { version = "0.59.0", optional = true }
+deno_net = { version = "0.57.0", optional = true }
+deno_tls = { version = "0.52.0", optional = true }
+deno_url = { version = "0.65.0", optional = true }
+deno_web = { version = "0.96.0", optional = true }
+deno_webgpu = { version = "0.66.0", optional = true }
+deno_webidl = { version = "0.65.0", optional = true }
+deno_websocket = { version = "0.70.0", optional = true }
+deno_webstorage = { version = "0.60.0", optional = true }
 glob = { version = "0.3.0", optional = true }
 zstd = "0.11.2"
 
