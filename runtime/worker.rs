@@ -162,9 +162,6 @@ impl MainWorker {
             deno_crypto::init(options.seed),
             #[cfg(feature = "ext_webgpu")]
             deno_webgpu::init(unstable),
-            // ffi
-            #[cfg(feature = "ext_ffi")]
-            deno_ffi::init::<Permissions>(unstable),
             // Runtime ops
             // ops::runtime::init(main_module.clone()),
             ops::worker_host::init(

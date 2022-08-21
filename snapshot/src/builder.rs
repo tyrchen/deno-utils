@@ -39,8 +39,6 @@ pub fn _create_snapshot(
         deno_webgpu::init(false),
         deno_broadcast_channel::init(InMemoryBroadcastChannel::default(), false),
         deno_tls::init(),
-        #[cfg(feature = "build_ffi")]
-        deno_ffi::init::<Permissions>(false),
         deno_net::init::<Permissions>(
             None, false, // No --unstable.
             None,

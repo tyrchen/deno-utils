@@ -6,8 +6,6 @@ pub use deno_console;
 pub use deno_core;
 pub use deno_crypto;
 pub use deno_fetch;
-#[cfg(feature = "ext_ffi")]
-pub use deno_ffi;
 pub use deno_http;
 pub use deno_net;
 pub use deno_node;
