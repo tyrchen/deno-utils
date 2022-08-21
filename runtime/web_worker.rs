@@ -6,7 +6,7 @@ use crate::js;
 use crate::ops;
 use crate::ops::io::Stdio;
 use crate::permissions::Permissions;
-use crate::tokio_util::run_basic;
+use crate::tokio_util::run_local;
 use crate::worker::FormatJsErrorFn;
 use crate::BootstrapOptions;
 use deno_broadcast_channel::InMemoryBroadcastChannel;
@@ -414,6 +414,7 @@ impl WebWorker {
                 unstable,
                 options.unsafely_ignore_certificate_errors.clone(),
             ),
+            // deno_node::init(), // todo(dsherret): re-enable
             ops::os::init_for_worker(),
             ops::permissions::init(),
             ops::process::init(),
@@ -505,22 +506,24 @@ impl WebWorker {
         Ok(())
     }
 
-    /// Loads and instantiates specified JavaScript module
-    /// as "main" or "side" module.
-    pub async fn preload_module(
+    /// Loads and instantiates specified JavaScript module as "main" module.
+    pub async fn preload_main_module(
         &mut self,
         module_specifier: &ModuleSpecifier,
-        main: bool,
     ) -> Result<ModuleId, AnyError> {
-        if main {
-            self.js_runtime
-                .load_main_module(module_specifier, None)
-                .await
-        } else {
-            self.js_runtime
-                .load_side_module(module_specifier, None)
-                .await
-        }
+        self.js_runtime
+            .load_main_module(module_specifier, None)
+            .await
+    }
+
+    /// Loads and instantiates specified JavaScript module as "side" module.
+    pub async fn preload_side_module(
+        &mut self,
+        module_specifier: &ModuleSpecifier,
+    ) -> Result<ModuleId, AnyError> {
+        self.js_runtime
+            .load_side_module(module_specifier, None)
+            .await
     }
 
     /// Loads, instantiates and executes specified JavaScript module.
@@ -531,7 +534,7 @@ impl WebWorker {
         &mut self,
         module_specifier: &ModuleSpecifier,
     ) -> Result<(), AnyError> {
-        let id = self.preload_module(module_specifier, false).await?;
+        let id = self.preload_side_module(module_specifier).await?;
         let mut receiver = self.js_runtime.mod_evaluate(id);
         tokio::select! {
           biased;
@@ -674,7 +677,7 @@ pub fn run_web_worker(
         } else {
             // TODO(bartlomieju): add "type": "classic", ie. ability to load
             // script instead of module
-            match worker.preload_module(&specifier, true).await {
+            match worker.preload_main_module(&specifier).await {
                 Ok(id) => {
                     worker.start_polling_for_messages();
                     worker.execute_main_module(id).await
@@ -708,5 +711,5 @@ pub fn run_web_worker(
         debug!("Worker thread shuts down {}", &name);
         result
     };
-    run_basic(fut)
+    run_local(fut)
 }

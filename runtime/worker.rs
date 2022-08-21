@@ -183,6 +183,7 @@ impl MainWorker {
                 unstable,
                 options.unsafely_ignore_certificate_errors.clone(),
             ),
+            // deno_node::init() // todo(dsherret): re-enable,
             ops::os::init(exit_code.clone()),
             ops::permissions::init(),
             ops::process::init(),
@@ -255,26 +256,29 @@ impl MainWorker {
         Ok(())
     }
 
-    /// Loads and instantiates specified JavaScript module
-    /// as "main" or "side" module.
-    pub async fn preload_module(
+    /// Loads and instantiates specified JavaScript module as "main" module.
+    pub async fn preload_main_module(
         &mut self,
         module_specifier: &ModuleSpecifier,
-        main: bool,
     ) -> Result<ModuleId, AnyError> {
-        if main {
-            self.js_runtime
-                .load_main_module(module_specifier, None)
-                .await
-        } else {
-            self.js_runtime
-                .load_side_module(module_specifier, None)
-                .await
-        }
+        self.js_runtime
+            .load_main_module(module_specifier, None)
+            .await
+    }
+
+    /// Loads and instantiates specified JavaScript module as "side" module.
+    pub async fn preload_side_module(
+        &mut self,
+        module_specifier: &ModuleSpecifier,
+    ) -> Result<ModuleId, AnyError> {
+        self.js_runtime
+            .load_side_module(module_specifier, None)
+            .await
     }
 
     /// Executes specified JavaScript module.
     pub async fn evaluate_module(&mut self, id: ModuleId) -> Result<(), AnyError> {
+        self.wait_for_inspector_session();
         let mut receiver = self.js_runtime.mod_evaluate(id);
         tokio::select! {
           // Not using biased mode leads to non-determinism for relatively simple
@@ -299,7 +303,7 @@ impl MainWorker {
         &mut self,
         module_specifier: &ModuleSpecifier,
     ) -> Result<(), AnyError> {
-        let id = self.preload_module(module_specifier, false).await?;
+        let id = self.preload_side_module(module_specifier).await?;
         self.wait_for_inspector_session();
         self.evaluate_module(id).await
     }
@@ -398,6 +402,21 @@ impl MainWorker {
             // used a saved reference to global scope.
             "dispatchEvent(new Event('unload'))",
         )
+    }
+
+    /// Dispatches "beforeunload" event to the JavaScript runtime. Returns a boolean
+    /// indicating if the event was prevented and thus event loop should continue
+    /// running.
+    pub fn dispatch_beforeunload_event(&mut self, script_name: &str) -> Result<bool, AnyError> {
+        let value = self.js_runtime.execute_script(
+            script_name,
+            // NOTE(@bartlomieju): not using `globalThis` here, because user might delete
+            // it. Instead we're using global `dispatchEvent` function which will
+            // used a saved reference to global scope.
+            "dispatchEvent(new Event('beforeunload', { cancelable: true }));",
+        )?;
+        let local_value = value.open(&mut self.js_runtime.handle_scope());
+        Ok(local_value.is_false())
     }
 }
 
