@@ -76,7 +76,7 @@ deno-snapshot = { version = "0.6.0", path = "../snapshot" }
 
 [target.'cfg(windows)'.dependencies]
 fwdansi = "1.1.0"
-winapi = { version = "0.3.9", features = ["commapi", "knownfolders", "mswsock", "objbase", "shlobj", "tlhelp32", "winbase", "winerror", "winsock2"] }
+winapi = { version = "0.3.9", features = ["commapi", "knownfolders", "mswsock", "objbase", "shlobj", "tlhelp32", "winbase", "winerror", "winsock2","winuser"] }
 
 [target.'cfg(unix)'.dependencies]
 nix = "0.25.0"
