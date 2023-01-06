@@ -31,5 +31,5 @@ deno-utils = { version = "0.7.0", path = "../utils", features = ["bundle", "tran
 
 
 [dev-dependencies]
-tokio = { version = "1.20.1", features = ["full"] }
+tokio = { version = "1.20.3", features = ["full"] }
 tracing-subscriber = "0.3.15"
